@@ -5,6 +5,8 @@ from nba_api.stats.static import teams
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import players
+from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import commonallplayers
 import time
 
 
@@ -63,7 +65,7 @@ def getTeamBoxScoresBetweenYears(teamName, start_year, end_year):
 
 
     filename = 'datasets/{}_{}_to_{}.csv'.format(teamName, start_year, end_year)
-    print(filename)
+    # print(filename)
     frame.to_csv(filename, index=None, header=True)
 
     return frame
@@ -92,16 +94,64 @@ def getAllTeamBoxScoresBetweenYears(start_year, end_year):
         time.sleep(10) # without this line, the API sends a connection timeout error after the first couple requests
 
 
-# Returns a list of dictionaries, each one representing a player in the NBA
 def getAllNbaPlayers():
+    """
+    IMPORTANT: the list contains all players ever, not just current players
+    :return: list of dictionaries, each representing an NBA player
+    """
     nba_players = players.get_players()
     return nba_players
 
 
 
+def getPlayerNameFromId(player_id):
+    """
+    Given ID of the player, gets the full name of the NBA player associated with the ID
+    :param player_id:
+    :return:
+    """
+    nba_players = getAllNbaPlayers()
+    curr_player = [player for player in nba_players
+                   if player['id'] == player_id][0]
+
+    full_name = curr_player["full_name"]
+    print(full_name)
+    return full_name
+
+
+
+def getPlayerRegularSeasonStats(player_id):
+    """
+    Given a player id, gets their career regular season stats from the NBA.com API and returns that dataframe
+    :param player_id: NBA.com player id (ex. 1495)
+    :return: pandas DataFrame containing the stats
+    """
+    # given a player_id
+    stats = playercareerstats.PlayerCareerStats(player_id=player_id).get_data_frames()[0]
+    # print(type(stats))
+    return stats
+
+
+def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
+    """
+
+    :param player_name:
+    :param regular_season_stats:
+    :return:
+    """
+
+    # replace spaces in player name with underscore
+    player_name.replace(" ", "_")
+
+    # format the filename
+    filename = 'datasets/player_stats/{}_Reg_Season_Stats.csv'.format(player_name)
+    # print(filename)
+    stats.to_csv(filename, index=None, header=True)
 
 
 if __name__ == "__main__":
     # frame = getTeamBoxScoresBetweenYears('MEM', 2015, 2018)
     # getAllTeamBoxScoresBetweenYears(2015, 2018)
-    player_testing()
+    # getAllNbaPlayers()
+    stats = getPlayerRegularSeasonStats(1495)
+    # getPlayerNameFromId(1495)
