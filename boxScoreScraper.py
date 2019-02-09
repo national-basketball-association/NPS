@@ -4,6 +4,7 @@ from nba_api.stats.endpoints import teamgamelog
 from nba_api.stats.static import teams
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import leaguegamefinder
+from nba_api.stats.static import players
 import time
 
 
@@ -91,7 +92,16 @@ def getAllTeamBoxScoresBetweenYears(start_year, end_year):
         time.sleep(10) # without this line, the API sends a connection timeout error after the first couple requests
 
 
+# Returns a list of dictionaries, each one representing a player in the NBA
+def getAllNbaPlayers():
+    nba_players = players.get_players()
+    return nba_players
+
+
+
+
 
 if __name__ == "__main__":
     # frame = getTeamBoxScoresBetweenYears('MEM', 2015, 2018)
-    getAllTeamBoxScoresBetweenYears(2015, 2018)
+    # getAllTeamBoxScoresBetweenYears(2015, 2018)
+    player_testing()
