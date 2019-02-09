@@ -155,3 +155,4 @@ if __name__ == "__main__":
     # getAllNbaPlayers()
     stats = getPlayerRegularSeasonStats(1495)
     # getPlayerNameFromId(1495)
+    writeRegularSeasonStatsToCsv("Tim Duncan", stats)
