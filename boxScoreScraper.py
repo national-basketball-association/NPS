@@ -6,8 +6,9 @@ from nba_api.stats.static import players
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats
-from nba_api.stats.endpoints import commonallplayers
+from nba_api.stats.endpoints import commonteamroster
 import time
+import sys
 
 
 teamToIndex = {
@@ -146,13 +147,16 @@ def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
     # format the filename
     filename = 'datasets/player_stats/{}_Reg_Season_Stats.csv'.format(player_name)
     # print(filename)
-    stats.to_csv(filename, index=None, header=True)
+    regular_season_stats.to_csv(filename, index=None, header=True)
 
+
+
+def common(team_id):
+    stats = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
 
 if __name__ == "__main__":
     # frame = getTeamBoxScoresBetweenYears('MEM', 2015, 2018)
-    # getAllTeamBoxScoresBetweenYears(2015, 2018)
-    # getAllNbaPlayers()
-    stats = getPlayerRegularSeasonStats(1495)
-    # getPlayerNameFromId(1495)
-    writeRegularSeasonStatsToCsv("Tim Duncan", stats)
+    # common()
+    for team in teams.get_teams():
+        common(team['id'])
+        sys.exit(1)
