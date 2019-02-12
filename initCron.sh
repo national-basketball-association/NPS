@@ -7,7 +7,7 @@ FILEPATH="$(pwd)"
 echo "MAILTO=\"sidhantchadda@gmail.com\"" > cron
 
 #runs every day at midnight
-echo "00 00 * * * python /Users/sidhantchadda/NPS/"$pwd"boxScoreScraper.py" >> cron
+echo "00 00 * * * python $FILEPATH/boxScoreScraper.py" >> cron
 
 
 #start cronjob
