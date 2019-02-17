@@ -7,6 +7,8 @@ from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats
 from nba_api.stats.endpoints import commonteamroster
+from nba_api.stats.endpoints import commonallplayers
+from nba_api.stats.endpoints import playercareerstats
 import time
 import sys
 
@@ -151,12 +153,35 @@ def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
 
 
 
-def common(team_id):
+def commonteamroster(team_id):
     stats = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
 
+def getAllCurrentPlayerIds():
+    """
+    Returns a Pandas dataframe containing all current player names and IDs
+    :return: Pandas dataframe, use PERSON_ID and DISPLAY_LAST_COMMA_FIRST for the ID and names
+    """
+    stats = commonallplayers.CommonAllPlayers(is_only_current_season=1).get_data_frames()[0]
+    return stats
+
+def scrapePlayerStats():
+    player_information = getAllCurrentPlayerIds() # get a list of player names and IDs
+    for index, row in player_information.iterrows():
+        curr_id = row['PERSON_ID']
+        curr_full_name = row['DISPLAY_FIRST_LAST']
+        formatted_full_name = curr_full_name.replace(" ", "_")
+
+
+        current_player_stats = playercareerstats.PlayerCareerStats(curr_id).get_data_frames()[0]
+        filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_full_name)
+
+        current_player_stats.to_csv(filename, index=None, header=True)
+        print("Wrote to {}".format(filename))
+        time.sleep(5)
+
+
 if __name__ == "__main__":
-    # frame = getTeamBoxScoresBetweenYears('MEM', 2015, 2018)
-    # common()
-    for team in teams.get_teams():
-        common(team['id'])
-        sys.exit(1)
+    # stats = getAllCurrentPlayerIds()
+    # filename = 'datasets/test.csv'
+    # stats.to_csv(filename)
+    scrapePlayerStats()
