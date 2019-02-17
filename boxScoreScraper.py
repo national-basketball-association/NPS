@@ -4,7 +4,13 @@ from nba_api.stats.endpoints import teamgamelog
 from nba_api.stats.static import teams
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import leaguegamefinder
+from nba_api.stats.static import players
+from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import commonteamroster
+from nba_api.stats.endpoints import commonallplayers
+from nba_api.stats.endpoints import playercareerstats
 import time
+import sys
 
 
 teamToIndex = {
@@ -62,7 +68,7 @@ def getTeamBoxScoresBetweenYears(teamName, start_year, end_year):
 
 
     filename = 'datasets/{}_{}_to_{}.csv'.format(teamName, start_year, end_year)
-    print(filename)
+    # print(filename)
     frame.to_csv(filename, index=None, header=True)
 
     return frame
@@ -91,7 +97,91 @@ def getAllTeamBoxScoresBetweenYears(start_year, end_year):
         time.sleep(10) # without this line, the API sends a connection timeout error after the first couple requests
 
 
+def getAllNbaPlayers():
+    """
+    IMPORTANT: the list contains all players ever, not just current players
+    :return: list of dictionaries, each representing an NBA player
+    """
+    nba_players = players.get_players()
+    return nba_players
+
+
+
+def getPlayerNameFromId(player_id):
+    """
+    Given ID of the player, gets the full name of the NBA player associated with the ID
+    :param player_id:
+    :return:
+    """
+    nba_players = getAllNbaPlayers()
+    curr_player = [player for player in nba_players
+                   if player['id'] == player_id][0]
+
+    full_name = curr_player["full_name"]
+    print(full_name)
+    return full_name
+
+
+
+def getPlayerRegularSeasonStats(player_id):
+    """
+    Given a player id, gets their career regular season stats from the NBA.com API and returns that dataframe
+    :param player_id: NBA.com player id (ex. 1495)
+    :return: pandas DataFrame containing the stats
+    """
+    # given a player_id
+    stats = playercareerstats.PlayerCareerStats(player_id=player_id).get_data_frames()[0]
+    # print(type(stats))
+    return stats
+
+
+def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
+    """
+
+    :param player_name:
+    :param regular_season_stats:
+    :return:
+    """
+
+    # replace spaces in player name with underscore
+    player_name.replace(" ", "_")
+
+    # format the filename
+    filename = 'datasets/player_stats/{}_Reg_Season_Stats.csv'.format(player_name)
+    # print(filename)
+    regular_season_stats.to_csv(filename, index=None, header=True)
+
+
+
+def commonteamroster(team_id):
+    stats = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+
+def getAllCurrentPlayerIds():
+    """
+    Returns a Pandas dataframe containing all current player names and IDs
+    :return: Pandas dataframe, use PERSON_ID and DISPLAY_LAST_COMMA_FIRST for the ID and names
+    """
+    stats = commonallplayers.CommonAllPlayers(is_only_current_season=1).get_data_frames()[0]
+    return stats
+
+def scrapePlayerStats():
+    player_information = getAllCurrentPlayerIds() # get a list of player names and IDs
+    for index, row in player_information.iterrows():
+        curr_id = row['PERSON_ID']
+        curr_full_name = row['DISPLAY_FIRST_LAST']
+        formatted_full_name = curr_full_name.replace(" ", "_")
+
+
+        current_player_stats = playercareerstats.PlayerCareerStats(curr_id).get_data_frames()[0]
+        filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_full_name)
+
+        current_player_stats.to_csv(filename, index=None, header=True)
+        print("Wrote to {}".format(filename))
+        time.sleep(5)
+
 
 if __name__ == "__main__":
-    # frame = getTeamBoxScoresBetweenYears('MEM', 2015, 2018)
-    getAllTeamBoxScoresBetweenYears(2015, 2018)
+    # stats = getAllCurrentPlayerIds()
+    # filename = 'datasets/test.csv'
+    # stats.to_csv(filename)
+    scrapePlayerStats()
