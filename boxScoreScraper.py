@@ -181,7 +181,5 @@ def scrapePlayerStats():
 
 
 if __name__ == "__main__":
-    # stats = getAllCurrentPlayerIds()
-    # filename = 'datasets/test.csv'
-    # stats.to_csv(filename)
+    getAllTeamBoxScoresBetweenYears(2015, 2018)
     scrapePlayerStats()
