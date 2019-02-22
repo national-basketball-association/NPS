@@ -94,7 +94,8 @@ def getAllTeamBoxScoresBetweenYears(start_year, end_year):
     # iterate over all the team name abbreviations
     for key in teamToIndex.keys():
         getTeamBoxScoresBetweenYears(key, start_year, end_year) # call the helper method with the current team
-        time.sleep(5) # without this line, the API sends a connection timeout error after the first couple requests
+        print("finished {}".format(key))
+        time.sleep(2) # without this line, the API sends a connection timeout error after the first couple requests
 
 
 def getAllNbaPlayers():
@@ -182,4 +183,5 @@ def scrapePlayerStats():
 
 if __name__ == "__main__":
     getAllTeamBoxScoresBetweenYears(2015, 2018)
+    sys.exit(1)
     scrapePlayerStats()
