@@ -2,10 +2,8 @@ import urllib.request, json
 
 from nba_api.stats.endpoints import teamgamelog
 from nba_api.stats.static import teams
-from nba_api.stats.static import players
 from nba_api.stats.endpoints import leaguegamefinder
 from nba_api.stats.static import players
-from nba_api.stats.endpoints import playercareerstats
 from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playercareerstats
@@ -107,6 +105,15 @@ def getAllNbaPlayers():
     return nba_players
 
 
+def getAllNbaTeams():
+    """
+    IMPORTANT: the list contains the teams in the NBA
+    :return:
+    """
+    nba_teams = teams.get_teams()
+    return nba_teams
+
+
 
 def getPlayerNameFromId(player_id):
     """
@@ -154,8 +161,8 @@ def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
 
 
 
-def commonteamroster(team_id):
-    stats = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+# def commonteamroster(team_id):
+#     stats = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
 
 def getAllCurrentPlayerIds():
     """
@@ -181,7 +188,24 @@ def scrapePlayerStats():
         time.sleep(5)
 
 
+def scrapeTeamRosters():
+    teams = getAllNbaTeams()
+    # print(teams)
+    for team in teams:
+        # print(team)
+        team_id = team['id']
+        team_abbrev = team['abbreviation']
+
+        time.sleep(5)
+        current_team_roster = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+        print(current_team_roster)
+        filename = 'datasets/rosters/{}_Roster.csv'.format(team_abbrev)
+        current_team_roster.to_csv(filename, index=None, header=True)
+        print("finished {}'s roster".format(team_abbrev))
+
+
+
 if __name__ == "__main__":
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    sys.exit(1)
     scrapePlayerStats()
+    # scrapeTeamRosters()
