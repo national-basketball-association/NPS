@@ -175,12 +175,25 @@ def getAllCurrentPlayerIds():
 
 def getTodaysPlayers():
     data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
-    print(data.to_string())
-    home_team_ids = data('HOME_TEAM_ID').tolist()
+    # print(data.to_string())
+    # print(list(data))
+    playing_team_ids = []
+    home_team_ids = data["HOME_TEAM_ID"].tolist()
     print(home_team_ids)
+    playing_team_ids += home_team_ids
 
+    print(data.to_string())
 
+    away_team_ids = data["VISITOR_TEAM_ID"].tolist()
 
+    playing_team_ids += away_team_ids
+
+    for team_id in playing_team_ids:
+        curr_team = [team for team in getAllNbaTeams()
+                     if team['id'] == team_id]
+        # print(curr_team)
+
+        
 
 def scrapePlayerStats():
     player_information = getAllCurrentPlayerIds() # get a list of player names and IDs
