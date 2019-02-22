@@ -7,6 +7,7 @@ from nba_api.stats.static import players
 from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import scoreboardv2
 import time
 import sys
 
@@ -172,6 +173,51 @@ def getAllCurrentPlayerIds():
     stats = commonallplayers.CommonAllPlayers(is_only_current_season=1).get_data_frames()[0]
     return stats
 
+def getTodaysPlayers():
+
+    """
+    Returns a list of player IDs belonging to players that played today
+    :return:
+    """
+    data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
+
+    player_ids = []
+
+    # print(data.to_string())
+    # print(list(data))
+    playing_team_ids = []
+    home_team_ids = data["HOME_TEAM_ID"].tolist()
+    print(home_team_ids)
+    playing_team_ids += home_team_ids
+
+    print(data.to_string())
+
+    away_team_ids = data["VISITOR_TEAM_ID"].tolist()
+
+    playing_team_ids += away_team_ids
+
+
+
+    for team_id in playing_team_ids:
+        # curr_team = [team for team in getAllNbaTeams()
+        #              if team['id'] == team_id]
+
+        current_team_roster = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
+        time.sleep(5)
+        for index, row in current_team_roster.iterrows():
+            player_id = row['PLAYER_ID']
+            player_ids.append(player_id)
+
+
+
+    print(player_ids)
+    return player_ids
+
+
+
+
+
+
 def scrapePlayerStats():
     player_information = getAllCurrentPlayerIds() # get a list of player names and IDs
     for index, row in player_information.iterrows():
@@ -181,7 +227,29 @@ def scrapePlayerStats():
 
 
         current_player_stats = playercareerstats.PlayerCareerStats(curr_id).get_data_frames()[0]
+        print(current_player_stats)
         filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_full_name)
+
+        current_player_stats.to_csv(filename, index=None, header=True)
+        print("Wrote to {}".format(filename))
+        time.sleep(5)
+
+def scrapeTodaysPlayerStats(player_ids):
+    for player_id in player_ids:
+        player_info = [player for player in getAllNbaPlayers()
+                       if player['id'] == player_id]
+        # print(player_info)
+        if player_info == []:
+            continue
+        player_dict = player_info[0]
+
+        player_name = player_dict['full_name']
+        # print(player_name)
+        # sys.exit(1)
+        formatted_name = player_name.replace(" ", "_")
+        current_player_stats = playercareerstats.PlayerCareerStats(player_id).get_data_frames()[0]
+        print(current_player_stats)
+        filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_name)
 
         current_player_stats.to_csv(filename, index=None, header=True)
         print("Wrote to {}".format(filename))
@@ -206,6 +274,10 @@ def scrapeTeamRosters():
 
 
 if __name__ == "__main__":
-    getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
+    # getAllTeamBoxScoresBetweenYears(2015, 2018)
+    # scrapePlayerStats()
     # scrapeTeamRosters()
+    # getTodaysPlayers()
+    issaList = [201567, 203917, 1629012, 1627737, 1628417, 2747, 203903, 101112, 1628021, 202684, 1626224, 203521, 202688, 1626204, 203089, 1629061, 1627790, 1628383, 203118, 101161, 1629312, 1629015, 203516, 204456, 203613, 200755, 1629003, 203954, 202710, 1627732, 1627788, 202699, 1628413, 1626246, 1629066, 1626156, 201162, 203915, 201960, 1629033, 203925, 203894, 1626210, 202334, 1626203, 1627747, 1626178, 1629058, 1628386, 203459, 1628979, 201588, 1628391, 202339, 1628978, 201572, 1627763, 203503, 203114, 1628425, 1626192, 1628537, 203507, 1626174, 202703, 1629045, 101141, 202326, 1627814, 1628395, 1626188, 1626172, 2738, 1628980, 202691, 1627745, 201973, 203110, 1628035, 201939, 1629094, 2733, 201142, 1628398, 203484, 1628366, 1628404, 1627936, 2199, 202362, 201580, 200765, 1627742, 1629021, 1629067, 1629140, 2544, 203488, 203493, 1628393, 1626164, 1629059, 1626162, 1628994, 2037, 203933, 1629001, 204020, 1628367, 1626158, 1629028, 1628969, 1629034, 203584, 1627733, 1626196, 1628999, 2548, 1627884, 201609, 203482, 203079, 1629150, 1628389, 201949, 203585, 1626159, 202355, 201583, 2617, 1629130, 202683, 203081, 202323, 203468, 203090, 203918, 202329, 1629018, 1627774, 203086, 1627746, 1629014, 203994, 203552, 1628380, 1628369, 1627759, 202954, 202681, 1626179, 202694, 202330, 1628464, 1626154, 1627824, 203935, 1628400, 201143, 1629057, 203382, 1628408, 1626161, 1627812, 1628368, 203992, 1628412, 202692, 1627786, 1628385, 1627741, 1629117, 201147, 1628963, 203084, 201585, 1628403, 202357, 202697, 101108, 1627863, 1629109, 201569, 1629053, 201935, 101123, 203991, 200782, 203085, 202702, 2403, 1628392]
+
+    scrapeTodaysPlayerStats(issaList)
