@@ -94,7 +94,7 @@ def getAllTeamBoxScoresBetweenYears(start_year, end_year):
     # iterate over all the team name abbreviations
     for key in teamToIndex.keys():
         getTeamBoxScoresBetweenYears(key, start_year, end_year) # call the helper method with the current team
-        time.sleep(10) # without this line, the API sends a connection timeout error after the first couple requests
+        time.sleep(5) # without this line, the API sends a connection timeout error after the first couple requests
 
 
 def getAllNbaPlayers():
