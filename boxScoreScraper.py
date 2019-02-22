@@ -7,6 +7,7 @@ from nba_api.stats.static import players
 from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playercareerstats
+from nba_api.stats.endpoints import scoreboardv2
 import time
 import sys
 
@@ -172,6 +173,15 @@ def getAllCurrentPlayerIds():
     stats = commonallplayers.CommonAllPlayers(is_only_current_season=1).get_data_frames()[0]
     return stats
 
+def getTodaysPlayers():
+    data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
+    print(data.to_string())
+    home_team_ids = data('HOME_TEAM_ID').tolist()
+    print(home_team_ids)
+
+
+
+
 def scrapePlayerStats():
     player_information = getAllCurrentPlayerIds() # get a list of player names and IDs
     for index, row in player_information.iterrows():
@@ -206,6 +216,7 @@ def scrapeTeamRosters():
 
 
 if __name__ == "__main__":
-    getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
+    # getAllTeamBoxScoresBetweenYears(2015, 2018)
+    # scrapePlayerStats()
     # scrapeTeamRosters()
+    getTodaysPlayers()
