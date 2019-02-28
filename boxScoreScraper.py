@@ -187,10 +187,10 @@ def getTodaysPlayers():
     # print(list(data))
     playing_team_ids = []
     home_team_ids = data["HOME_TEAM_ID"].tolist()
-    print(home_team_ids)
+    # print(home_team_ids)
     playing_team_ids += home_team_ids
 
-    print(data.to_string())
+    # print(data.to_string())
 
     away_team_ids = data["VISITOR_TEAM_ID"].tolist()
 
@@ -203,7 +203,7 @@ def getTodaysPlayers():
         #              if team['id'] == team_id]
 
         current_team_roster = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
-        time.sleep(5)
+        time.sleep(2)
         for index, row in current_team_roster.iterrows():
             player_id = row['PLAYER_ID']
             player_ids.append(player_id)
@@ -274,9 +274,9 @@ def scrapeTeamRosters():
 
 
 if __name__ == "__main__":
-    # getAllTeamBoxScoresBetweenYears(2015, 2018)
-    # scrapePlayerStats()
-    # scrapeTeamRosters()
+    getAllTeamBoxScoresBetweenYears(2015, 2018)
+    scrapePlayerStats()
+    scrapeTeamRosters()
 
-    todays_players = getTodaysPlayers()
-    scrapeTodaysPlayerStats(todays_players)
+    # todays_players = getTodaysPlayers()
+    # scrapeTodaysPlayerStats(todays_players)
