@@ -275,5 +275,8 @@ def scrapeTeamRosters():
 
 if __name__ == "__main__":
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
+    # scrapePlayerStats()
     scrapeTeamRosters()
+
+    todays_players = getTodaysPlayers()
+    scrapeTodaysPlayerStats(todays_players)
