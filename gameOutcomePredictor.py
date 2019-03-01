@@ -25,7 +25,42 @@ def load_dataset(filename):
     return dataset
 
 
+def general_preview(dataset):
+    """
+    Given a pandas dataframe, shows a general description of the data
+    :param dataset:
+    :return:
+    """
+    print("Shape: {}".format(dataset.shape))
+    print("Head:")
+    print(dataset.head(5))
+    print("Description:")
+    print(dataset.describe())
+
+    # grouping by wins/losses
+    print("Grouping by wins/losses:")
+    print(dataset.groupby("WL").size())
+
+
+def view_basic_plots(dataset):
+    # create box and whisker plots
+    # dataset.plot(kind='box', subplots=True, layout=(2, 2), sharex=False, sharey=False)
+    # plt.show()
+    scatter_matrix(dataset)
+    plt.show()
+
+
+
+def build_model(dataset):
+    """
+    Given a dataset containing information about a team's games, this will build and return a ML model
+    :param dataset: pandas dataframe containing game logs for one team
+    :return:
+    """
+
 
 if __name__ == "__main__":
     dataset = load_dataset("datasets/ATL_2015_to_2018.csv")
-    print(dataset.head(5))
+    # print(dataset.head(5))
+    # general_preview(dataset)
+    view_basic_plots(dataset)
