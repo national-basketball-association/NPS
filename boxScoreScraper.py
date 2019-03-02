@@ -52,8 +52,10 @@ def getTeamBoxScoreForYear(teamName, season):
     gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=teamNameId)
     games = gamefinder.get_data_frames()[0]
 
+
     #filter to the season required
     games_in_season = games[games.SEASON_ID.str[-4:] == season[:4]]
+    # games_in_season.sort_values("GAME_DATE")
     return games_in_season
 
 
@@ -64,6 +66,9 @@ def getTeamBoxScoresBetweenYears(teamName, start_year, end_year):
     for x in range(end_year-start_year):
         season = formatYearToSeason(start_year+1+x)
         frame = frame.append(getTeamBoxScoreForYear(teamName, season), ignore_index=True)
+
+
+    frame = frame.sort_values("GAME_DATE")
 
 
     filename = 'datasets/{}_{}_to_{}.csv'.format(teamName, start_year, end_year)
@@ -275,8 +280,8 @@ def scrapeTeamRosters():
 
 if __name__ == "__main__":
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
-    scrapeTeamRosters()
+    # scrapePlayerStats()
+    # scrapeTeamRosters()
 
     # todays_players = getTodaysPlayers()
     # scrapeTodaysPlayerStats(todays_players)
