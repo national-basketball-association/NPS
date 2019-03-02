@@ -143,7 +143,7 @@ def build_model(dataset):
 
 
 
-def predicting(dataset):
+def predicting(dataset, filename):
     """
     idk what im doing so im making this other method to try new stuff
     :return:
@@ -240,19 +240,6 @@ def predicting(dataset):
 
     scoring = 'accuracy'
 
-    # test_models(X_train, Y_train, scoring, seed)
-
-
-    # according to test, i should probably use linear regression but we're going with knn for now
-    #
-    # knn = KNeighborsClassifier()
-    # knn.fit(X_train, Y_train)
-    # predictions = knn.predict(X_validation)
-    # print(accuracy_score(Y_validation, predictions))
-    # print(confusion_matrix(Y_validation, predictions))
-    # print(classification_report(Y_validation, predictions))
-
-
     # the test said that decision tree classifier scored well, so we're going with that
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
@@ -261,6 +248,14 @@ def predicting(dataset):
     print(confusion_matrix(Y_validation, predictions))
     print(classification_report(Y_validation, predictions))
 
+
+
+def save_model(model, filename):
+    pickle.dump(model, open(filename, 'wb'))
+
+def load_model(filename):
+    loaded_model = pickle.load(open(filename, 'rb'))
+    return loaded_model
 
 
 def test_models(X_train, Y_train, scoring, seed):
@@ -312,4 +307,4 @@ if __name__ == "__main__":
     # general_preview(dataset)
     # view_basic_plots(dataset)
     # build_model(dataset)
-    predicting(dataset)
+    predicting(dataset, "ATL_Model.sav")
