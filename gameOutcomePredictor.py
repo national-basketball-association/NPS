@@ -153,6 +153,8 @@ def predicting(dataset):
 
     df = dataset
 
+    df = df.sort_values("GAME_DATE")
+
     df["HOME WIN"] = 0
     df["HOME TEAM"] = 0
 
@@ -238,8 +240,39 @@ def predicting(dataset):
 
     scoring = 'accuracy'
 
-    # check the accuracy of some models
+    # test_models(X_train, Y_train, scoring, seed)
 
+
+    # according to test, i should probably use linear regression but we're going with knn for now
+    #
+    # knn = KNeighborsClassifier()
+    # knn.fit(X_train, Y_train)
+    # predictions = knn.predict(X_validation)
+    # print(accuracy_score(Y_validation, predictions))
+    # print(confusion_matrix(Y_validation, predictions))
+    # print(classification_report(Y_validation, predictions))
+
+
+    # the test said that decision tree classifier scored well, so we're going with that
+    dtc = DecisionTreeClassifier()
+    dtc.fit(X_train, Y_train)
+    predictions = dtc.predict(X_validation)
+    print(accuracy_score(Y_validation, predictions))
+    print(confusion_matrix(Y_validation, predictions))
+    print(classification_report(Y_validation, predictions))
+
+
+
+def test_models(X_train, Y_train, scoring, seed):
+    """
+    Given sets of data, tests which model is best to use
+    :param X_train:
+    :param Y_train:
+    :param kfold:
+    :param scoring:
+    :param seed:
+    :return:
+    """
     models = []
     models.append(('LR', LogisticRegression(solver='liblinear', multi_class='ovr')))
     models.append(('LDA', LinearDiscriminantAnalysis()))
@@ -248,28 +281,15 @@ def predicting(dataset):
     models.append(('NB', GaussianNB()))
     models.append(('SVM', SVC(gamma='auto')))
 
-    # results = []
-    # names = []
-    # for name, model in models:
-    #     kfold = model_selection.KFold(n_splits=10, random_state=seed)
-    #     cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
-    #     results.append(cv_results)
-    #     names.append(name)
-    #     msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-    #     print(msg)
-
-
-
-    # according to test, i should probably use linear regression but we're going with knn for now
-
-    knn = KNeighborsClassifier()
-    knn.fit(X_train, Y_train)
-    predictions = knn.predict(X_validation)
-    print(accuracy_score(Y_validation, predictions))
-    print(confusion_matrix(Y_validation, predictions))
-    print(classification_report(Y_validation, predictions))
-
-    # apparently accuracy is 92% which seems way too high, so we're tryna do it with ydays game
+    results = []
+    names = []
+    for name, model in models:
+        kfold = model_selection.KFold(n_splits=10, random_state=seed)
+        cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+        results.append(cv_results)
+        names.append(name)
+        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+        print(msg)
 
 
 def calculate_home_win_percentage(df):
