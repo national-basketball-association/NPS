@@ -143,7 +143,7 @@ def build_model(dataset):
 
 
 
-def predicting(dataset, filename):
+def create_model(dataset):
     """
     idk what im doing so im making this other method to try new stuff
     :return:
@@ -217,40 +217,59 @@ def predicting(dataset, filename):
     matchups_transformed = le.transform(matchups)
     df["MATCHUPS_TRANSFORMED"] = matchups_transformed
 
-    # print(df.head(5))
-
-    # sys.exit(1)
 
     array = df.values
 
-    print(df.dtypes)
+    # print(df.dtypes)
 
-    X = array[:,[29,30,32]] # the home team and win_streak features
-    print(X)
-    # X = X.astype('int')
-    # print(X)
+    X = array[:,[29,30,32]] # the home team, win_streak, and matchups_transformed features
+    # print(len(X))
     Y = array[:,31] # the win loss bool feature
     Y = Y.astype('int')
-    # sys.exit(1)
 
     validation_size = 0.20
     seed = 7
     X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size,
                                                                                     random_state=seed)
 
+
     scoring = 'accuracy'
 
     # the test said that decision tree classifier scored well, so we're going with that
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
-    predictions = dtc.predict(X_validation)
-    print(accuracy_score(Y_validation, predictions))
-    print(confusion_matrix(Y_validation, predictions))
-    print(classification_report(Y_validation, predictions))
+    # predictions = dtc.predict(X_validation)
+    # print(accuracy_score(Y_validation, predictions))
+    # print(confusion_matrix(Y_validation, predictions))
+    # print(classification_report(Y_validation, predictions))
+
+    # print(le.transform(["ATL vs. CHI"]))
+
+
+    return dtc
+
+
+def make_prediction(model, matchup, df):
+    le = LabelEncoder()
+    # transformed = le.fit_transform((df["MATCHUP"].values).tolist())
+    le.fit((df["MATCHUP"].values).tolist())
+
+    # transform the matchup into a number
+    transformed_matchup = le.transform([matchup])
+    # print(transformed_matchup)
+
+    prediction = model.predict([[1,1,transformed_matchup]])
+    print(prediction)
 
 
 
 def save_model(model, filename):
+    """
+    Given an ML model and a filename, saves the model to that file so it can be reloaded later
+    :param model:
+    :param filename:
+    :return:
+    """
     pickle.dump(model, open(filename, 'wb'))
 
 def load_model(filename):
@@ -263,7 +282,6 @@ def test_models(X_train, Y_train, scoring, seed):
     Given sets of data, tests which model is best to use
     :param X_train:
     :param Y_train:
-    :param kfold:
     :param scoring:
     :param seed:
     :return:
@@ -307,4 +325,7 @@ if __name__ == "__main__":
     # general_preview(dataset)
     # view_basic_plots(dataset)
     # build_model(dataset)
-    predicting(dataset, "ATL_Model.sav")
+    model = create_model(dataset)
+    # save_model(model, "ATL_Model.sav")
+    make_prediction(model, "ATL vs. CHI", dataset)
+
