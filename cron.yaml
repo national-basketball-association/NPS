@@ -1,4 +1,0 @@
-cron:
-- description: "a job that scrapes nba data"
-  url: /tasks/nps
-  schedule: every 24 hours
