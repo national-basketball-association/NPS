@@ -205,7 +205,22 @@ def predicting(dataset):
     # df has some new features
     array = df.values
 
+    # need to encode the matchup feature because it is a categorical variable
+    le = LabelEncoder()
+    matchups = (df["MATCHUP"].values).tolist()
+    # print(matchups)
+    le.fit(matchups) #fitting the label encoder to the list of different matchups
+
+    # now get a transformation of the matchups column
+    matchups_transformed = le.transform(matchups)
+    df["MATCHUPS_TRANSFORMED"] = matchups_transformed
+
     print(df.head(5))
+
+    sys.exit(1)
+
+
+
     X = array[:,[29,30]] # the home team and win_streak features
     # print(X)
     X = X.astype('int')
@@ -239,25 +254,6 @@ def predicting(dataset):
         names.append(name)
         msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
         print(msg)
-
-    # print(models)
-
-    # print(df.head(5))
-    # print(df.dtypes)
-    #
-    #
-    # y_true = df["WL_BOOL"].values
-    # y_true = y_true.astype('int')
-    #
-    # X_previouswins = df[["HOME TEAM", "WIN STREAK"]].values
-    #
-    # # print(X_previouswins)
-    # dtc = DecisionTreeClassifier(random_state=14)
-    # kfold = model_selection.KFold(n_splits=10, random_state=14)
-    # scores=model_selection.cross_val_score(dtc, X_previouswins, y_true, cv=kfold, scoring="accuracy")
-    #
-    # print('F1: {0:.4f}%'.format(numpy.mean(scores) * 100))
-
 
 
 def calculate_home_win_percentage(df):
