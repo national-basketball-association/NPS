@@ -14,6 +14,8 @@ from sklearn.svm import SVC
 import pickle
 import sys
 import numpy
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 def load_dataset(filename):
     """
@@ -61,13 +63,29 @@ def build_model(dataset):
 
 
     array = dataset.values
-    # print(type(array))
     # print(array[:,6]
+
+    # iterate through and change W/L to 1/0
+    py_list = array.tolist()
+    for x in py_list:
+        win_or_loss = x[7]
+        if win_or_loss == 'W':
+            x[7] = 1
+        else:
+            x[7] = 0
+        # print(x[7])
+
+    array = numpy.asarray(py_list)
+
+
+
 
     X = array[:,6] # this is the matchup, which would be the input if we were making a prediction
 
-    Y = array[:, [0,1,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]] # this is the output
-    # print(Y)
+    # Y = array[:, [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]] # this is the output
+    Y = array[:,7]
+    print(Y)
+
 
 
     validation_size = 0.20
@@ -80,16 +98,47 @@ def build_model(dataset):
 
     # the data has been split into training and testing splits
 
-    
+    scoring='accuracy'
 
 
-    # models = []
-    # models.append(('LR', LogisticRegression(solver='liblinear', multi_class='ovr')))
-    # models.append(('LDA', LinearDiscriminantAnalysis()))
-    # models.append(('KNN', KNeighborsClassifier()))
-    # models.append(('CART', DecisionTreeClassifier()))
-    # models.append(('NB', GaussianNB()))
-    # models.append(('SVM', SVC(gamma='auto')))
+    # need to use labelencoder to transform the matchup strings into normalized numbers
+    le=  LabelEncoder()
+    x_train_label_transformed = le.fit_transform(X_train)
+
+    # print(x_train_label_transformed)
+
+    X_train = x_train_label_transformed.astype(float)
+
+    X_train = X_train.reshape(-1,1)
+
+    onehotencoder1 = OneHotEncoder(categories='auto')
+    x_train_cat_data = onehotencoder1.fit_transform(X_train)
+    # X_train_transformed = onehotencoder1.fit_transform(X_train).toarray()
+
+    # print(x_train_cat_data)
+    # sys.exit(22)
+
+    models = []
+    models.append(('LR', LogisticRegression(solver='liblinear', multi_class='ovr')))
+    models.append(('LDA', LinearDiscriminantAnalysis()))
+    models.append(('KNN', KNeighborsClassifier()))
+    models.append(('CART', DecisionTreeClassifier()))
+    models.append(('NB', GaussianNB()))
+    models.append(('SVM', SVC(gamma='auto')))
+
+    results = []
+    names = []
+    for name, model in models:
+        kfold = model_selection.KFold(n_splits=10, random_state=seed)
+        cv_results = model_selection.cross_val_score(model,
+                                                     x_train_cat_data,
+                                                     Y_train,
+                                                     cv=kfold,
+                                                     scoring=scoring)
+        results.append(cv_results)
+        names.append(name)
+        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+        print(msg)
 
 
 if __name__ == "__main__":
