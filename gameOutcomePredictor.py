@@ -16,6 +16,7 @@ import sys
 import numpy
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import f1_score
 
 def load_dataset(filename):
     """
@@ -153,14 +154,22 @@ def predicting(dataset):
     df = dataset
 
     df["HOME WIN"] = False
+    df["HOME TEAM"] = False
 
     # iterate over the data to find when this team won on their home court
     for index, row in df.iterrows():
         matchup = df.at[index, "MATCHUP"] # get the matchup for the current game
+
+
+        # record whether they were the home team
+        if "vs." in matchup:
+            df.at[index ,"HOME TEAM"] = True
+
+        # record whether they won as the home team
         if "vs." in matchup:
             # if they are the home team, check if they won
             win_loss = df.at[index, "WL"]
-            print("WIN LOSS IS  {}".format(win_loss))
+            # print("WIN LOSS IS  {}".format(win_loss))
             if win_loss == "W":
                 # this means they were the home team and won, so record that value
                 df.at[index, "HOME WIN"] = True
@@ -169,8 +178,24 @@ def predicting(dataset):
         else:
             df.at[index, "HOME WIN"] = False
 
-    print(df.head(6))
 
+
+
+
+
+
+def calculate_home_win_percentage(df):
+    """
+    Given a dataset created by predicting(), calculates the home win percentage. That number can serve as a baseline
+    to test the effectiveness of the mdoel
+    :param df:
+    :return:
+    """
+    num_home_wins = df["HOME WIN"].sum()
+    num_home_games = df["HOME TEAM"].sum()
+    win_percentage = num_home_wins / num_home_games
+
+    print('Home Win percentage: {0:.2f}%'.format(100 * win_percentage))
 
 
 if __name__ == "__main__":
