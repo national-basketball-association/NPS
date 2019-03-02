@@ -141,9 +141,42 @@ def build_model(dataset):
         print(msg)
 
 
+
+def predicting(dataset):
+    """
+    idk what im doing so im making this other method to try new stuff
+    :return:
+    """
+
+    pandas.set_option('display.max_columns', None) # setting options to display all columns when printing dataframe
+
+    df = dataset
+
+    df["HOME WIN"] = False
+
+    # iterate over the data to find when this team won on their home court
+    for index, row in df.iterrows():
+        matchup = df.at[index, "MATCHUP"] # get the matchup for the current game
+        if "vs." in matchup:
+            # if they are the home team, check if they won
+            win_loss = df.at[index, "WL"]
+            print("WIN LOSS IS  {}".format(win_loss))
+            if win_loss == "W":
+                # this means they were the home team and won, so record that value
+                df.at[index, "HOME WIN"] = True
+            else:
+                df.at[index, "HOME WIN"] = False
+        else:
+            df.at[index, "HOME WIN"] = False
+
+    print(df.head(6))
+
+
+
 if __name__ == "__main__":
     dataset = load_dataset("datasets/ATL_2015_to_2018.csv")
     # print(dataset.head(5))
     # general_preview(dataset)
     # view_basic_plots(dataset)
-    build_model(dataset)
+    # build_model(dataset)
+    predicting(dataset)
