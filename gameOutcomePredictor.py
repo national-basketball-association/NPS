@@ -203,7 +203,7 @@ def predicting(dataset):
 
 
     # df has some new features
-    array = df.values
+
 
     # need to encode the matchup feature because it is a categorical variable
     le = LabelEncoder()
@@ -215,15 +215,18 @@ def predicting(dataset):
     matchups_transformed = le.transform(matchups)
     df["MATCHUPS_TRANSFORMED"] = matchups_transformed
 
-    print(df.head(5))
+    # print(df.head(5))
 
-    sys.exit(1)
+    # sys.exit(1)
 
+    array = df.values
 
+    print(df.dtypes)
 
-    X = array[:,[29,30]] # the home team and win_streak features
+    X = array[:,[29,30,32]] # the home team and win_streak features
+    print(X)
+    # X = X.astype('int')
     # print(X)
-    X = X.astype('int')
     Y = array[:,31] # the win loss bool feature
     Y = Y.astype('int')
     # sys.exit(1)
@@ -245,15 +248,28 @@ def predicting(dataset):
     models.append(('NB', GaussianNB()))
     models.append(('SVM', SVC(gamma='auto')))
 
-    results = []
-    names = []
-    for name, model in models:
-        kfold = model_selection.KFold(n_splits=10, random_state=seed)
-        cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
-        results.append(cv_results)
-        names.append(name)
-        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-        print(msg)
+    # results = []
+    # names = []
+    # for name, model in models:
+    #     kfold = model_selection.KFold(n_splits=10, random_state=seed)
+    #     cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+    #     results.append(cv_results)
+    #     names.append(name)
+    #     msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+    #     print(msg)
+
+
+
+    # according to test, i should probably use linear regression but we're going with knn for now
+
+    knn = KNeighborsClassifier()
+    knn.fit(X_train, Y_train)
+    predictions = knn.predict(X_validation)
+    print(accuracy_score(Y_validation, predictions))
+    print(confusion_matrix(Y_validation, predictions))
+    print(classification_report(Y_validation, predictions))
+
+    # apparently accuracy is 92% which seems way too high, so we're tryna do it with ydays game
 
 
 def calculate_home_win_percentage(df):
