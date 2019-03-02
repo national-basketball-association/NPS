@@ -153,8 +153,11 @@ def predicting(dataset):
 
     df = dataset
 
-    df["HOME WIN"] = False
-    df["HOME TEAM"] = False
+    df["HOME WIN"] = 0
+    df["HOME TEAM"] = 0
+
+
+    win_streak = 0
 
     # iterate over the data to find when this team won on their home court
     for index, row in df.iterrows():
@@ -163,7 +166,9 @@ def predicting(dataset):
 
         # record whether they were the home team
         if "vs." in matchup:
-            df.at[index ,"HOME TEAM"] = True
+            df.at[index ,"HOME TEAM"] = 1
+        else:
+            df.at[index, "HOME TEAM"] = 0
 
         # record whether they won as the home team
         if "vs." in matchup:
@@ -172,15 +177,86 @@ def predicting(dataset):
             # print("WIN LOSS IS  {}".format(win_loss))
             if win_loss == "W":
                 # this means they were the home team and won, so record that value
-                df.at[index, "HOME WIN"] = True
+                df.at[index, "HOME WIN"] = 1
             else:
-                df.at[index, "HOME WIN"] = False
+                df.at[index, "HOME WIN"] = 0
         else:
-            df.at[index, "HOME WIN"] = False
+            df.at[index, "HOME WIN"] = 1
 
 
+        # add a feature that tracks their current winning streak
+        win_loss = df.at[index, "WL"] # whether they won the game or not
+        if win_loss == 'W':
+            # increment the win streak by 1
+            win_streak += 1
+            df.at[index, "WIN STREAK"] = win_streak
 
 
+            # set the WL_BOOL colum to true
+            df.at[index, "WL_BOOL"] = 1
+        else:
+            win_streak = 0
+            df.at[index, "WIN STREAK"] = win_streak
+
+            # set WL BOOL column
+            df.at[index, "WL_BOOL"] = 0
+
+
+    # df has some new features
+    array = df.values
+
+    print(df.head(5))
+    X = array[:,[29,30]] # the home team and win_streak features
+    # print(X)
+    X = X.astype('int')
+    Y = array[:,31] # the win loss bool feature
+    Y = Y.astype('int')
+    # sys.exit(1)
+
+    validation_size = 0.20
+    seed = 7
+    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size,
+                                                                                    random_state=seed)
+
+    scoring = 'accuracy'
+
+    # check the accuracy of some models
+
+    models = []
+    models.append(('LR', LogisticRegression(solver='liblinear', multi_class='ovr')))
+    models.append(('LDA', LinearDiscriminantAnalysis()))
+    models.append(('KNN', KNeighborsClassifier()))
+    models.append(('CART', DecisionTreeClassifier()))
+    models.append(('NB', GaussianNB()))
+    models.append(('SVM', SVC(gamma='auto')))
+
+    results = []
+    names = []
+    for name, model in models:
+        kfold = model_selection.KFold(n_splits=10, random_state=seed)
+        cv_results = model_selection.cross_val_score(model, X_train, Y_train, cv=kfold, scoring=scoring)
+        results.append(cv_results)
+        names.append(name)
+        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+        print(msg)
+
+    # print(models)
+
+    # print(df.head(5))
+    # print(df.dtypes)
+    #
+    #
+    # y_true = df["WL_BOOL"].values
+    # y_true = y_true.astype('int')
+    #
+    # X_previouswins = df[["HOME TEAM", "WIN STREAK"]].values
+    #
+    # # print(X_previouswins)
+    # dtc = DecisionTreeClassifier(random_state=14)
+    # kfold = model_selection.KFold(n_splits=10, random_state=14)
+    # scores=model_selection.cross_val_score(dtc, X_previouswins, y_true, cv=kfold, scoring="accuracy")
+    #
+    # print('F1: {0:.4f}%'.format(numpy.mean(scores) * 100))
 
 
 
