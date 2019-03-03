@@ -175,6 +175,12 @@ def make_prediction(model, matchup, df):
 
     wins_losses = get_team_record(team) # get the current record of the team
 
+    # check whether this is a home game for the team the model was trained for
+    is_home = 1
+
+    if "@" in tokens[1]:
+        is_home = 0
+
     le = LabelEncoder()
     # transformed = le.fit_transform((df["MATCHUP"].values).tolist())
     le.fit((df["MATCHUP"].values).tolist())
@@ -185,11 +191,38 @@ def make_prediction(model, matchup, df):
 
 
 
+    # get the team's current win_streak
+    win_streak = get_team_winstreak(df)
 
-    prediction = model.predict([[wins_losses[0],wins_losses[1],1,1,transformed_matchup]])
+    print("WIN STREAK IS {} ".format(win_streak))
+
+    prediction = model.predict([
+        [wins_losses[0],
+         wins_losses[1],
+         is_home,
+         win_streak,
+         transformed_matchup]])
 
     if 1 in prediction:
         print(prediction)
+
+    return prediction
+
+
+def get_team_winstreak(df):
+    df = df[::-1]
+
+    # iterate over the rows and count the current win streak
+    win_streak = 0
+    for index, row in df.iterrows():
+        win_or_loss = df.at[index, "WL"]
+        if win_or_loss == 'W':
+            win_streak += 1
+        else:
+            # the loss breaks the streak
+            # return win_streak
+            return win_streak
+
 
 def get_team_record(team_abbrev):
     """
