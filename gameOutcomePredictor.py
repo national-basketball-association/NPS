@@ -60,7 +60,7 @@ def create_model(dataset):
     :return:
     """
 
-    pandas.set_option('display.max_columns', None) # setting options to display all columns when printing dataframe
+    pandas.set_option('display.max_columns', 9) # setting options to display all columns when printing dataframe
 
     df = dataset
 

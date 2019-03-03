@@ -11,6 +11,7 @@ from nba_api.stats.endpoints import scoreboardv2
 from nba_api.stats.endpoints import teamyearbyyearstats
 import time
 import sys
+import pandas
 
 
 teamToIndex = {
@@ -50,13 +51,33 @@ teamToIndex = {
 def getTeamBoxScoreForYear(teamName, season):
     teamNameId = getTeamIdFromName(teamName)
     # this should find all games where celtics were playing
+    time.sleep(5)
     gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=teamNameId)
     games = gamefinder.get_data_frames()[0]
 
 
     #filter to the season required
     games_in_season = games[games.SEASON_ID.str[-4:] == season[:4]]
-    # games_in_season.sort_values("GAME_DATE")
+
+
+    games_in_season = games_in_season.sort_values("GAME_DATE",ascending=True) # sorting the games by game_date
+
+    # print(games_in_season.head(10))
+    # sys.exit(1)
+
+    # iterate over the games in the dataframe and add number of wins and number of losses at every log
+    num_wins = 0
+    num_losses = 0
+    for index, row in games_in_season.iterrows():
+        winloss = games_in_season.at[index, "WL"]
+        if winloss == 'W':
+            num_wins += 1
+        else:
+            num_losses += 1
+
+        games_in_season.at[index, "NUM_WINS"] = num_wins
+        games_in_season.at[index, "NUM_LOSSES"] = num_losses
+
     return games_in_season
 
 
@@ -303,10 +324,12 @@ def scrapeTeamStats():
 
 
 if __name__ == "__main__":
-    scrapeTeamStats()
+    pandas.set_option('display.max_columns', None)
+
+    # scrapeTeamStats()
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
-    scrapeTeamRosters()
+    # scrapePlayerStats()
+    # scrapeTeamRosters()
 
     # todays_players = getTodaysPlayers()
     # scrapeTodaysPlayerStats(todays_players)
