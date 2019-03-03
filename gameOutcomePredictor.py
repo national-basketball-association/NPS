@@ -250,6 +250,9 @@ def create_model(dataset):
 
 
 def make_prediction(model, matchup, df):
+    # format of the input feature vector should be [HOME_TEAM, WIN_STREAK, TRANSFORMED_MATCHUP)
+
+
     le = LabelEncoder()
     # transformed = le.fit_transform((df["MATCHUP"].values).tolist())
     le.fit((df["MATCHUP"].values).tolist())
@@ -258,7 +261,8 @@ def make_prediction(model, matchup, df):
     transformed_matchup = le.transform([matchup])
     # print(transformed_matchup)
 
-    prediction = model.predict([[1,1,transformed_matchup]])
+
+    prediction = model.predict([[0,7.0,transformed_matchup]])
     print(prediction)
 
 
@@ -320,12 +324,12 @@ def calculate_home_win_percentage(df):
 
 
 if __name__ == "__main__":
-    dataset = load_dataset("datasets/ATL_2015_to_2018.csv")
+    dataset = load_dataset("datasets/MIL_2015_to_2018.csv")
     # print(dataset.head(5))
     # general_preview(dataset)
     # view_basic_plots(dataset)
     # build_model(dataset)
     model = create_model(dataset)
     # save_model(model, "ATL_Model.sav")
-    make_prediction(model, "ATL vs. CHI", dataset)
+    make_prediction(model, "MIL @ UTA", dataset)
 
