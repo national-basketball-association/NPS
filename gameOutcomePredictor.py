@@ -60,7 +60,7 @@ def create_model(dataset):
     :return:
     """
 
-    pandas.set_option('display.max_columns', 9) # setting options to display all columns when printing dataframe
+    pandas.set_option('display.max_columns', None) # setting options to display all columns when printing dataframe
 
     df = dataset
 
@@ -133,9 +133,9 @@ def create_model(dataset):
 
     # print(df.dtypes)
 
-    X = array[:,[29,30,32]] # the home team, win_streak, and matchups_transformed features
+    X = array[:,[28,29, 31,32,34]] # the home team, win_streak, and matchups_transformed features
     # print(len(X))
-    Y = array[:,31] # the win loss bool feature
+    Y = array[:,33] # the win loss bool feature
     Y = Y.astype('int')
 
     validation_size = 0.20
@@ -161,7 +161,7 @@ def create_model(dataset):
 
 
 def make_prediction(model, matchup, df):
-    # format of the input feature vector should be [HOME_TEAM, WIN_STREAK, TRANSFORMED_MATCHUP)
+    # format of the input feature vector should be [NUM_WINS, NUM_LOSSES, HOME_TEAM, WIN_STREAK, TRANSFORMED_MATCHUP)
 
 
     le = LabelEncoder()
@@ -173,7 +173,7 @@ def make_prediction(model, matchup, df):
     # print(transformed_matchup)
 
 
-    prediction = model.predict([[0,7.0,transformed_matchup]])
+    prediction = model.predict([[15,48,1,1,transformed_matchup]])
     print(prediction)
 
 
@@ -235,12 +235,12 @@ def calculate_home_win_percentage(df):
 
 
 if __name__ == "__main__":
-    dataset = load_dataset("datasets/MIL_2015_to_2018.csv")
+    dataset = load_dataset("datasets/CLE_2015_to_2018.csv")
     # print(dataset.head(5))
     # general_preview(dataset)
     # view_basic_plots(dataset)
     # build_model(dataset)
     model = create_model(dataset)
     # save_model(model, "ATL_Model.sav")
-    make_prediction(model, "MIL @ UTA", dataset)
+    make_prediction(model, "CLE vs. DET", dataset)
 
