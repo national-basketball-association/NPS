@@ -174,8 +174,37 @@ def make_prediction(model, matchup, df):
 
 
     prediction = model.predict([[15,48,1,1,transformed_matchup]])
-    print(prediction)
 
+    if 1 in prediction:
+        print(prediction)
+
+def get_team_record(team_abbrev):
+    """
+
+    Given the abbreviation for a team, returns their current record
+    :param team_abbrev:
+    :return:
+    """
+    filename = "datasets/team_stats/" + team_abbrev + "_Stats_By_Year.csv"
+
+    print(filename)
+
+    df = load_dataset(filename) # load the data containing team stats
+
+    # print(df.iloc[-1:])
+
+    last_row = df.iloc[-1:]
+
+    wins = (last_row["WINS"].values)[0]
+
+    losses = (last_row["LOSSES"].values)[0]
+
+    wins_losses = []
+
+    wins_losses.append(wins)
+    wins_losses.append(losses)
+
+    return wins_losses
 
 
 def save_model(model, filename):
@@ -243,4 +272,8 @@ if __name__ == "__main__":
     model = create_model(dataset)
     # save_model(model, "ATL_Model.sav")
     make_prediction(model, "CLE vs. DET", dataset)
+
+    get_team_record("CLE")
+
+    # dataset =
 
