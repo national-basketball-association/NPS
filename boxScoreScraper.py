@@ -8,6 +8,7 @@ from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playercareerstats
 from nba_api.stats.endpoints import scoreboardv2
+from nba_api.stats.endpoints import teamyearbyyearstats
 import time
 import sys
 
@@ -277,8 +278,32 @@ def scrapeTeamRosters():
         print("finished {}'s roster".format(team_abbrev))
 
 
+def scrapeTeamStats():
+    """
+    Scrapes team stats year by year for every team in the NBA
+    :return: None
+    """
+    teams = getAllNbaTeams()
+
+    # iterate overa ll the teams
+    for team in teams:
+        team_id = team['id']
+        team_abbrev = team['abbreviation']
+
+        time.sleep(5)
+        current_team_stats = teamyearbyyearstats.TeamYearByYearStats(per_mode_simple="PerGame",
+                                                                     season_type_all_star="Regular Season",
+                                                                     team_id=team_id).get_data_frames()[0]
+
+        filename = 'datasets/team_stats/{}_Stats_By_Year.csv'.format(team_abbrev)
+
+        current_team_stats.to_csv(filename, index=None, header=True)
+        print("Finished scraping team stats for {}".format(team_abbrev))
+
+
 
 if __name__ == "__main__":
+    scrapeTeamStats()
     getAllTeamBoxScoresBetweenYears(2015, 2018)
     scrapePlayerStats()
     scrapeTeamRosters()
