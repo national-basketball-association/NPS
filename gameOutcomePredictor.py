@@ -161,8 +161,19 @@ def create_model(dataset):
 
 
 def make_prediction(model, matchup, df):
+    """
+    Makes a prediction using the given ml model, the given NBA matchup, and a dataframe containing the teams data
+    :param model:
+    :param matchup:
+    :param df:
+    :return:
+    """
     # format of the input feature vector should be [NUM_WINS, NUM_LOSSES, HOME_TEAM, WIN_STREAK, TRANSFORMED_MATCHUP)
 
+    tokens = matchup.split(" ")
+    team = tokens[0]
+
+    wins_losses = get_team_record(team) # get the current record of the team
 
     le = LabelEncoder()
     # transformed = le.fit_transform((df["MATCHUP"].values).tolist())
@@ -173,14 +184,15 @@ def make_prediction(model, matchup, df):
     # print(transformed_matchup)
 
 
-    prediction = model.predict([[15,48,1,1,transformed_matchup]])
+
+
+    prediction = model.predict([[wins_losses[0],wins_losses[1],1,1,transformed_matchup]])
 
     if 1 in prediction:
         print(prediction)
 
 def get_team_record(team_abbrev):
     """
-
     Given the abbreviation for a team, returns their current record
     :param team_abbrev:
     :return:
@@ -270,10 +282,9 @@ if __name__ == "__main__":
     # view_basic_plots(dataset)
     # build_model(dataset)
     model = create_model(dataset)
-    # save_model(model, "ATL_Model.sav")
+
+
+
     make_prediction(model, "CLE vs. DET", dataset)
 
-    get_team_record("CLE")
-
-    # dataset =
 
