@@ -204,7 +204,10 @@ def make_prediction(model, matchup, df):
          transformed_matchup]])
 
     if 1 in prediction:
-        print(prediction)
+        print("{} will win!".format(team))
+    else:
+        print("{} will lose!".format(team))
+
 
     return prediction
 
@@ -319,5 +322,13 @@ if __name__ == "__main__":
 
 
     make_prediction(model, "CLE vs. DET", dataset)
+
+    dataset = load_dataset("datasets/BOS_2015_to_2018.csv")
+    model = create_model(dataset)
+    make_prediction(model, "BOS vs. HOU", dataset)
+
+    df = load_dataset("datasets/TOR_2015_to_2018.csv")
+    model = create_model(df)
+    make_prediction(model, "TOR @ DET", df)
 
 
