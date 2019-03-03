@@ -62,9 +62,6 @@ def getTeamBoxScoreForYear(teamName, season):
 
     games_in_season = games_in_season.sort_values("GAME_DATE",ascending=True) # sorting the games by game_date
 
-    # print(games_in_season.head(10))
-    # sys.exit(1)
-
     # iterate over the games in the dataframe and add number of wins and number of losses at every log
     num_wins = 0
     num_losses = 0
