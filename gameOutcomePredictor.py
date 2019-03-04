@@ -196,6 +196,7 @@ def make_prediction(model, matchup, df):
 
     # get the team's current win_streak
     win_streak = get_team_winstreak(df)
+    print("{}'s current winstreak is {}".format(team, win_streak))
 
     print("WIN STREAK IS {} ".format(win_streak))
 
@@ -216,18 +217,49 @@ def make_prediction(model, matchup, df):
 
 
 def get_team_winstreak(df):
+    """
+    iterates over the rows in the given dataframe and calculates the teams current winning streak
+    :param df:
+    :return:
+    """
     df = df[::-1]
 
     # iterate over the rows and count the current win streak
     win_streak = 0
+    won_last_game = 2
     for index, row in df.iterrows():
+        # win_or_loss = df.at[index, "WL"]
+        # if win_or_loss == 'W':
+        #     win_streak += 1
+        # else:
+        #     # the loss breaks the streak
+        #     # return win_streak
+        #     return win_streak
         win_or_loss = df.at[index, "WL"]
         if win_or_loss == 'W':
-            win_streak += 1
+            # this means they're on a winning streak
+            if win_streak == 0:
+                # their most recent game was a W
+                win_streak += 1
+            else:
+                if win_streak > 0:
+                    # still counting wins
+                    win_streak += 1
+                else:
+                    return win_streak
+
         else:
-            # the loss breaks the streak
-            # return win_streak
-            return win_streak
+            # this means they're on a losing streak
+            if win_streak == 0:
+                # their most recent game was a L
+                win_streak -= 1
+            else:
+                # not looking at the most recent game
+                if win_streak > 0:
+                    # this is a win, so it breaks the streak of losses, return win_streak
+                    return win_streak
+                else:
+                    win_streak -= 1
 
 
 def get_team_record(team_abbrev):
