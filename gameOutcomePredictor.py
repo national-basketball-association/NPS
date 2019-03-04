@@ -150,9 +150,10 @@ def create_model(dataset):
     array = df.values
 
 
-
+    # print(df.head(5))
     X = array[:,[28,29, 31,32,34]] # the home team, win_streak, and matchups_transformed features
     Y = array[:,33] # the win loss bool feature
+    # Y = array[:,27] # testing to see how it works with predicting point spread
     Y = Y.astype('int')
 
     validation_size = 0.20
@@ -166,10 +167,11 @@ def create_model(dataset):
     # the test said that decision tree classifier scored well, so we're going with that
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
-    # predictions = dtc.predict(X_validation)
+    predictions = dtc.predict(X_validation)
     # print(accuracy_score(Y_validation, predictions))
     # print(confusion_matrix(Y_validation, predictions))
     # print(classification_report(Y_validation, predictions))
+    # print()
 
     # print(le.transform(["ATL vs. CHI"]))
 
@@ -392,6 +394,8 @@ def predict_todays_games():
         model = create_model(df)
 
         prediction = make_prediction(model, matchup, df)
+
+        # print("The predicted point spread for {} was {}".format(away_team_abbreviation, prediction[0]))
 
         if 1 in prediction:
             winners.append(away_team_abbreviation)
