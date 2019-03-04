@@ -17,6 +17,8 @@ import numpy
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import f1_score
+import datetime
+from nba_api.stats.endpoints import scoreboardv2
 
 def load_dataset(filename):
     """
@@ -311,6 +313,31 @@ def calculate_home_win_percentage(df):
     print('Home Win percentage: {0:.2f}%'.format(100 * win_percentage))
 
 
+def predict_todays_games(model):
+    """
+    Given an ML model, makes predictions for all the games happening today
+    :return:
+    """
+
+    # call the scoreboard endpoint to get the games happening today
+    scoreboard_data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
+
+
+    for index, row in scoreboard_data.iterrows():
+
+        # can get the teams playing by getting the GAMECODE of the row
+        gamecode = row["GAMECODE"]
+        tokens = gamecode.split("/")
+
+        teams_playing_str = tokens[1]
+
+        # slice the string to get the abbreviations of the teams playing
+        away_team_abbreviation = teams_playing_str[:3]
+        home_team_abbreviation = teams_playing_str[-3:]
+
+        
+
+
 if __name__ == "__main__":
     dataset = load_dataset("datasets/CLE_2015_to_2018.csv")
     # print(dataset.head(5))
@@ -319,16 +346,5 @@ if __name__ == "__main__":
     # build_model(dataset)
     model = create_model(dataset)
 
-
-
-    make_prediction(model, "CLE vs. DET", dataset)
-
-    dataset = load_dataset("datasets/BOS_2015_to_2018.csv")
-    model = create_model(dataset)
-    make_prediction(model, "BOS vs. HOU", dataset)
-
-    df = load_dataset("datasets/TOR_2015_to_2018.csv")
-    model = create_model(df)
-    make_prediction(model, "TOR @ DET", df)
-
+    predict_todays_games(model)
 
