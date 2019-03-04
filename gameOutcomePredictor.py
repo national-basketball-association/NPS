@@ -102,20 +102,36 @@ def create_model(dataset):
 
         # add a feature that tracks their current winning streak
         win_loss = df.at[index, "WL"] # whether they won the game or not
-        if win_loss == 'W':
-            # increment the win streak by 1
+
+        # positive numbers represent a winning streak, negative numbers represent a losing streak
+
+        # print(matchup)
+        if win_loss == 'W' and win_streak >= 0:
+            # either a new win streak and continuing win streak, so increment by 1
             win_streak += 1
             df.at[index, "WIN STREAK"] = win_streak
 
-
-            # set the WL_BOOL colum to true
             df.at[index, "WL_BOOL"] = 1
-        else:
-            win_streak = 0
+        elif win_loss == 'W' and win_streak < 0:
+            # they were on a losing streak, this breaks it
+            win_streak = 1
             df.at[index, "WIN STREAK"] = win_streak
 
-            # set WL BOOL column
+            df.at[index, "WL_BOOL"] = 1
+        elif win_loss == 'L' and win_streak > 0:
+            # they were on a winning streak, this breaks it, so set to -1
+            win_streak = -1
+            df.at[index, "WIN STREAK"] = win_streak
+
             df.at[index, "WL_BOOL"] = 0
+        elif win_loss == 'L' and win_streak <= 0:
+            # they were on a losing streak, so decrement by 1
+            win_streak -= 1
+            df.at[index, "WIN STREAK"] = win_streak
+
+            df.at[index, "WL_BOOL"] = 0
+
+        # print(win_streak)
 
 
     # df has some new features
@@ -124,7 +140,6 @@ def create_model(dataset):
     # need to encode the matchup feature because it is a categorical variable
     le = LabelEncoder()
     matchups = (df["MATCHUP"].values).tolist()
-    # print(matchups)
     le.fit(matchups) #fitting the label encoder to the list of different matchups
 
     # now get a transformation of the matchups column
@@ -134,10 +149,9 @@ def create_model(dataset):
 
     array = df.values
 
-    # print(df.dtypes)
+
 
     X = array[:,[28,29, 31,32,34]] # the home team, win_streak, and matchups_transformed features
-    # print(len(X))
     Y = array[:,33] # the win loss bool feature
     Y = Y.astype('int')
 
@@ -196,10 +210,6 @@ def make_prediction(model, matchup, df):
 
     # get the team's current win_streak
     win_streak = get_team_winstreak(df)
-    print("{}'s current winstreak is {}".format(team, win_streak))
-
-    print("WIN STREAK IS {} ".format(win_streak))
-
     prediction = model.predict([
         [wins_losses[0],
          wins_losses[1],
@@ -270,7 +280,7 @@ def get_team_record(team_abbrev):
     """
     filename = "datasets/team_stats/" + team_abbrev + "_Stats_By_Year.csv"
 
-    print(filename)
+    # print(filename)
 
     df = load_dataset(filename) # load the data containing team stats
 
