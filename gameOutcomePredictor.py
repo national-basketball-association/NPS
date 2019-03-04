@@ -407,12 +407,5 @@ def predict_todays_games():
 
 
 if __name__ == "__main__":
-    # dataset = load_dataset("datasets/CLE_2015_to_2018.csv")
-    # print(dataset.head(5))
-    # general_preview(dataset)
-    # view_basic_plots(dataset)
-    # build_model(dataset)
-    # model = create_model(dataset)
-
     predict_todays_games()
 
