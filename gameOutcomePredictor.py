@@ -13,6 +13,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 import pickle
 import sys
+import time
 import numpy
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
@@ -59,7 +60,7 @@ def view_basic_plots(dataset):
 def create_model(dataset):
     """
     idk what im doing so im making this other method to try new stuff
-    :return:
+    :return: A DecisionTreeClassifier model that can predict game outcomes for the team that the dataset belongs to
     """
 
     pandas.set_option('display.max_columns', None) # setting options to display all columns when printing dataframe
@@ -204,12 +205,12 @@ def make_prediction(model, matchup, df):
          is_home,
          win_streak,
          transformed_matchup]])
-
-    if 1 in prediction:
-        print("{} will win!".format(team))
-    else:
-        print("{} will lose!".format(team))
-
+    #
+    # if 1 in prediction:
+    #     print("{} will win!".format(team))
+    # else:
+    #     print("{} will lose!".format(team))
+    #
 
     return prediction
 
@@ -313,14 +314,17 @@ def calculate_home_win_percentage(df):
     print('Home Win percentage: {0:.2f}%'.format(100 * win_percentage))
 
 
-def predict_todays_games(model):
+def predict_todays_games():
     """
-    Given an ML model, makes predictions for all the games happening today
+    Creates a model for all the games happening today and tries to predict the outcomes
     :return:
     """
 
     # call the scoreboard endpoint to get the games happening today
     scoreboard_data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
+    time.sleep(2)
+
+    winners = []
 
 
     for index, row in scoreboard_data.iterrows():
@@ -335,16 +339,38 @@ def predict_todays_games(model):
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
 
-        
+        # format a matchup string using the abbreviations
+        matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
+
+        # get the dataframe for the away team
+        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        df = load_dataset(filename) # load a dataframe for the teams data
+
+        # create a model for the current team
+        model = create_model(df)
+
+        prediction = make_prediction(model, matchup, df)
+
+        if 1 in prediction:
+            winners.append(away_team_abbreviation)
+        else:
+            winners.append(home_team_abbreviation)
+
+
+    # should have predicted a winner for all the games, go through and print all the winners to the console
+    for x in winners:
+        print("I think {} will win!".format(x))
+
+    return winners
 
 
 if __name__ == "__main__":
-    dataset = load_dataset("datasets/CLE_2015_to_2018.csv")
+    # dataset = load_dataset("datasets/CLE_2015_to_2018.csv")
     # print(dataset.head(5))
     # general_preview(dataset)
     # view_basic_plots(dataset)
     # build_model(dataset)
-    model = create_model(dataset)
+    # model = create_model(dataset)
 
-    predict_todays_games(model)
+    predict_todays_games()
 
