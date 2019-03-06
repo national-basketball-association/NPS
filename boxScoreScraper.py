@@ -8,8 +8,10 @@ from nba_api.stats.endpoints import commonteamroster
 from nba_api.stats.endpoints import commonallplayers
 from nba_api.stats.endpoints import playercareerstats
 from nba_api.stats.endpoints import scoreboardv2
+from nba_api.stats.endpoints import teamyearbyyearstats
 import time
 import sys
+import pandas
 
 
 teamToIndex = {
@@ -49,11 +51,30 @@ teamToIndex = {
 def getTeamBoxScoreForYear(teamName, season):
     teamNameId = getTeamIdFromName(teamName)
     # this should find all games where celtics were playing
+    time.sleep(5)
     gamefinder = leaguegamefinder.LeagueGameFinder(team_id_nullable=teamNameId)
     games = gamefinder.get_data_frames()[0]
 
+
     #filter to the season required
     games_in_season = games[games.SEASON_ID.str[-4:] == season[:4]]
+
+
+    games_in_season = games_in_season.sort_values("GAME_DATE",ascending=True) # sorting the games by game_date
+
+    # iterate over the games in the dataframe and add number of wins and number of losses at every log
+    num_wins = 0
+    num_losses = 0
+    for index, row in games_in_season.iterrows():
+        winloss = games_in_season.at[index, "WL"]
+        if winloss == 'W':
+            num_wins += 1
+        else:
+            num_losses += 1
+
+        games_in_season.at[index, "NUM_WINS"] = num_wins
+        games_in_season.at[index, "NUM_LOSSES"] = num_losses
+
     return games_in_season
 
 
@@ -64,6 +85,9 @@ def getTeamBoxScoresBetweenYears(teamName, start_year, end_year):
     for x in range(end_year-start_year):
         season = formatYearToSeason(start_year+1+x)
         frame = frame.append(getTeamBoxScoreForYear(teamName, season), ignore_index=True)
+
+
+    frame = frame.sort_values("GAME_DATE")
 
 
     filename = 'datasets/{}_{}_to_{}.csv'.format(teamName, start_year, end_year)
@@ -272,11 +296,37 @@ def scrapeTeamRosters():
         print("finished {}'s roster".format(team_abbrev))
 
 
+def scrapeTeamStats():
+    """
+    Scrapes team stats year by year for every team in the NBA
+    :return: None
+    """
+    teams = getAllNbaTeams()
+
+    # iterate overa ll the teams
+    for team in teams:
+        team_id = team['id']
+        team_abbrev = team['abbreviation']
+
+        time.sleep(5)
+        current_team_stats = teamyearbyyearstats.TeamYearByYearStats(per_mode_simple="PerGame",
+                                                                     season_type_all_star="Regular Season",
+                                                                     team_id=team_id).get_data_frames()[0]
+
+        filename = 'datasets/team_stats/{}_Stats_By_Year.csv'.format(team_abbrev)
+
+        current_team_stats.to_csv(filename, index=None, header=True)
+        print("Finished scraping team stats for {}".format(team_abbrev))
+
+
 
 if __name__ == "__main__":
+    pandas.set_option('display.max_columns', None)
+
+    # scrapeTeamStats()
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
-    scrapeTeamRosters()
+    # scrapePlayerStats()
+    # scrapeTeamRosters()
 
     # todays_players = getTodaysPlayers()
     # scrapeTodaysPlayerStats(todays_players)
