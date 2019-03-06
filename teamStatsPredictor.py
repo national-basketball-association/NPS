@@ -50,7 +50,26 @@ def create_assists_model(team_abbrev, matchup):
     stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
     stats_df = load_dataset(stats_filename)
 
-    
+
+
+    # input features should be matchup, number of assists averaged on the season, win_percentage(?)
+
+    # num assists and win% are in the stats file, so we need to add that to the log dataframe
+    log_df["AST"] = 0
+    log_df["WIN_PCT"] = 0.0
+
+    for index, row in log_df.iterrows():
+        game_date = log_df.at[index, "GAME_DATE"] # get the game date for the current game
+
+        tokens = game_date.split("/")
+        year = tokens[2] # get the year of the game
+
+        # need to 
+
+
+
+
+
 
 
 
