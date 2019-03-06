@@ -41,7 +41,18 @@ def create_assists_model(team_abbrev, matchup):
     :param matchup: the matchup to predict the assists for
     :return:
     """
+
+    # first need to load the game logs
+    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_df = load_dataset(log_filename)
+
+    # now load the team stats
+    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_df = load_dataset(stats_filename)
+
     
+
+
 
 
 def predictTeamAssists():
@@ -70,10 +81,21 @@ def predictTeamAssists():
 
 
         # format a matchup string using the abbreviations
-        matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
+        away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
 
         # get the dataframe for the away team
         filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        away_assists_model = create_assists_model(away_team_abbreviation, matchup)
+        away_assists_model = create_assists_model(away_team_abbreviation, away_matchup)
+
+
+        home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
+
+        home_assists_model = create_assists_model(home_team_abbreviation, home_matchup)
+
+
+if __name__ == "__main__":
+    pandas.set_option('display.max_columns', None)
+
+    predictTeamAssists()
