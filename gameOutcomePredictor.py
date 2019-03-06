@@ -151,6 +151,9 @@ def create_model(dataset):
 
 
     # print(df.head(5))
+    # print(df.tail(2))
+    # print(df[df['WL_BOOL'].isnull()])
+    # sys.exit(1)
     X = array[:,[28,29, 31,32,34]] # the home team, win_streak, and matchups_transformed features
     Y = array[:,33] # the win loss bool feature
     # Y = array[:,27] # testing to see how it works with predicting point spread
