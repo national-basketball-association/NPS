@@ -125,15 +125,52 @@ def create_assists_model(team_abbrev, matchup):
     matchups = (log_df["MATCHUP"].values).tolist()
     le.fit(matchups)  # fitting the label encoder to the list of different matchups
 
+    # print(le.transform(["BOS @ SAC"]))
+    # sys.exit(1)
+
+
     # now get a transformation of the matchups column
     matchups_transformed = le.transform(matchups)
     log_df["MATCHUPS_TRANSFORMED"] = matchups_transformed
 
     array = log_df.values
 
-    
+    # print(log_df.head(1))
+    # sys.exit()
+    # now format the input and output feature vectors
+    X = array[:, [30, 31, 32]] # this should be the assist season average, the win percentage, and the matchup
+    Y = array[:,22] # this should be the assist total for a game
 
 
+    Y = Y.astype('int')
+
+    # now split into training and testing splits
+    validation_size = 0.20
+    seed = 7
+    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size,
+                                                                                    random_state=seed)
+
+    # set the type of scoring
+    scoring = 'accuracy'
+
+    dtc = DecisionTreeClassifier()
+    dtc.fit(X_train, Y_train)
+    # predictions = dtc.predict(X_validation)
+    # print(accuracy_score(Y_validation, predictions))
+    # print(confusion_matrix(Y_validation, predictions))
+    # print(classification_report(Y_validation, predictions))
+    # print()
+
+
+    return dtc
+
+
+
+
+def make_prediction(model):
+    vector = [[26.1, 0.603, 26]]
+    arr = model.predict(vector)
+    print(arr)
 
 
 
@@ -183,4 +220,6 @@ def predictTeamAssists():
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
 
-    predictTeamAssists()
+    # predictTeamAssists()
+    dtc = create_assists_model("BOS", "BOS @ SAC")
+    make_prediction(dtc)
