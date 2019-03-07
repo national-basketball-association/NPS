@@ -118,10 +118,20 @@ def create_assists_model(team_abbrev, matchup):
         # assists per game average and win percentage should be in the game log frame now
 
 
-    print(log_df.head(5))
-    sys.exit()
+    # the log dataframe should be formatted and usable for model training
 
+    # need to encode the matchup feature because it is a categorical variable
+    le = LabelEncoder()
+    matchups = (log_df["MATCHUP"].values).tolist()
+    le.fit(matchups)  # fitting the label encoder to the list of different matchups
 
+    # now get a transformation of the matchups column
+    matchups_transformed = le.transform(matchups)
+    log_df["MATCHUPS_TRANSFORMED"] = matchups_transformed
+
+    array = log_df.values
+
+    
 
 
 
