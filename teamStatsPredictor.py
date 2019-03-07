@@ -61,10 +61,46 @@ def create_assists_model(team_abbrev, matchup):
     for index, row in log_df.iterrows():
         game_date = log_df.at[index, "GAME_DATE"] # get the game date for the current game
 
-        tokens = game_date.split("/")
-        year = tokens[2] # get the year of the game
+        tokens = game_date.split("-")
+        year = tokens[0] # get the year of the game
+        month = tokens[1]
 
-        # need to 
+        season = ""
+
+        # determine the formatting of the season by checking whether the month was in the first or second half
+        # of the year
+
+        if int(month) >= 6:
+            # this is the beginning of a season
+
+
+            beginning_year = int(year)
+
+            end_year = int(year) + 1
+
+            end_year_str = (str(end_year))[-2:]
+
+            season = "{}-{}".format(str(beginning_year), end_year_str)
+
+        else:
+            # this is in the end of a season
+
+            end_year = str(year)
+
+            beginning_year = int(year) - 1
+
+            beginning_year_str = str(beginning_year)
+
+            end_year = end_year[-2:]
+
+            season = "{}-{}".format(beginning_year_str, end_year)
+
+        # the season should be formatted according to the format in the team stats file
+
+        
+
+
+
 
 
 
