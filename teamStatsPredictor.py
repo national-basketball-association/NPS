@@ -213,4 +213,3 @@ if __name__ == "__main__":
 
     # predictTeamAssists()
     dtc = create_assists_model("BOS", "BOS @ SAC")
-    make_prediction(dtc)
