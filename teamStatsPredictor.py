@@ -167,15 +167,6 @@ def create_assists_model(team_abbrev, matchup):
 
 
 
-def make_prediction(model):
-    vector = [[26.1, 0.603, 26]]
-    arr = model.predict(vector)
-    print(arr)
-
-
-
-
-
 
 def predictTeamAssists():
     """
