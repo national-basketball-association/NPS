@@ -55,7 +55,7 @@ def create_assists_model(team_abbrev, matchup):
     # input features should be matchup, number of assists averaged on the season, win_percentage(?)
 
     # num assists and win% are in the stats file, so we need to add that to the log dataframe
-    log_df["AST"] = 0
+    log_df["AST_SZN_AVG"] = 0
     log_df["WIN_PCT"] = 0.0
 
     for index, row in log_df.iterrows():
@@ -97,9 +97,29 @@ def create_assists_model(team_abbrev, matchup):
 
         # the season should be formatted according to the format in the team stats file
 
-        
+        # need to get the team's stats recorded for season
+
+        for stats_index, stats_row in stats_df.iterrows():
+            year = stats_df.at[stats_index, "YEAR"]
+            if year == season:
+                # get the assists and win % from this year
+                assists_per_game = stats_df.at[stats_index, "AST"]
+                win_pct = stats_df.at[stats_index, "WIN_PCT"]
+
+                # got the values needed from this season, now add them to the game log dataframe
+                log_df.at[index, "AST_SZN_AVG"] = assists_per_game
+                log_df.at[index, "WIN_PCT"] = win_pct
+
+                break
+            else:
+                continue
 
 
+        # assists per game average and win percentage should be in the game log frame now
+
+
+    print(log_df.head(5))
+    sys.exit()
 
 
 
