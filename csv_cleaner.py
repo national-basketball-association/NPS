@@ -28,8 +28,6 @@ for filename in os.listdir("datasets/"):
 
 
         # now have a list of rows to drop from the dataframe
-        for rownum in rows_to_delete:
-            row = df.drop(df.index[rownum])
+        modified_dataframe = df.drop(df.index[rows_to_delete])
         #overwrite the current file with the new clean dataset
-        print(full_filename)
-        df.to_csv(full_filename, index=None, header=True)
+        modified_dataframe.to_csv(full_filename, index=None, header=True)
