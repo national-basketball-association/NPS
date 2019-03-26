@@ -165,9 +165,6 @@ def create_assists_model(team_abbrev, matchup):
     return dtc
 
 
-
-
-
 def predictTeamAssists():
     """
     Predicts assists for all teams that are playing in games today
@@ -188,14 +185,9 @@ def predictTeamAssists():
         # slice the string to get the abbreviations of the teams playing
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
-
-
         # need to generate an assists model for both of those teams
-
-
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
-
         # get the dataframe for the away team
         filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data

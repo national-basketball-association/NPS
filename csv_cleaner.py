@@ -14,13 +14,22 @@ for filename in os.listdir("datasets/"):
         
         df = pandas.read_csv(full_filename)
 
-        print(df[df['WL'].isnull()])
+        # print(df[df['WL'].isnull()])
 
+        rows_to_delete = []
 
         for index, row in df.iterrows():
-            wl_val = df.at[index, "WL"]
+            has_no_wl_val = pandas.isnull(df.at[index, "WL"])
 
-            if len(wl_val) == 0:
-                print(row)
+            if has_no_wl_val:
+                rows_to_delete.append(index)
 
-        print()
+
+
+
+        # now have a list of rows to drop from the dataframe
+        for rownum in rows_to_delete:
+            row = df.drop(df.index[rownum])
+        #overwrite the current file with the new clean dataset
+        print(full_filename)
+        df.to_csv(full_filename, index=None, header=True)
