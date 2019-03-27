@@ -22,6 +22,8 @@ import datetime
 from nba_api.stats.endpoints import scoreboardv2
 
 
+verbose = False
+labelEncoder = None
 
 def load_dataset(filename):
     """
@@ -124,24 +126,20 @@ def create_assists_model(team_abbrev, matchup):
     le = LabelEncoder()
     matchups = (log_df["MATCHUP"].values).tolist()
     le.fit(matchups)  # fitting the label encoder to the list of different matchups
-
-    # print(le.transform(["BOS @ SAC"]))
-    # sys.exit(1)
-
+    global labelEncoder
+    labelEncoder = le
 
     # now get a transformation of the matchups column
     matchups_transformed = le.transform(matchups)
+
+
     log_df["MATCHUPS_TRANSFORMED"] = matchups_transformed
 
     array = log_df.values
 
-    # print(log_df.head(1))
-    # sys.exit()
     # now format the input and output feature vectors
     X = array[:, [30, 31, 32]] # this should be the assist season average, the win percentage, and the matchup
     Y = array[:,22] # this should be the assist total for a game
-
-
     Y = Y.astype('int')
 
     # now split into training and testing splits
@@ -155,11 +153,12 @@ def create_assists_model(team_abbrev, matchup):
 
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
-    # predictions = dtc.predict(X_validation)
-    # print(accuracy_score(Y_validation, predictions))
-    # print(confusion_matrix(Y_validation, predictions))
-    # print(classification_report(Y_validation, predictions))
-    # print()
+    if verbose:
+        predictions = dtc.predict(X_validation)
+        print(accuracy_score(Y_validation, predictions))
+        print(confusion_matrix(Y_validation, predictions))
+        print(classification_report(Y_validation, predictions))
+        print()
 
 
     return dtc
@@ -174,6 +173,8 @@ def predictTeamAssists():
     # call the scoreboard endpoint to get the games happening today
     scoreboard_data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
     time.sleep(2)
+
+    predictions = {}
 
     for index, row in scoreboard_data.iterrows():
         # can get the teams playing by getting the GAMECODE of the row
@@ -195,13 +196,71 @@ def predictTeamAssists():
         away_assists_model = create_assists_model(away_team_abbreviation, away_matchup)
 
 
+
+
+        # we now have a model for both the home and away team in the current matchup
+        # use the model to make a prediction
+        # first make a prediction for the away team
+        # the model requires assist season average, current winning percentage, and matchup as input variables
+        # get the assist season average
+        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+
+        # iterate over the team stats, find their current assist average and winning percentage
+        current_assist_average = 0
+        current_winning_percentage = 0
+        for team_stats_index, team_stats_row in away_team_stats.iterrows():
+            year = away_team_stats.at[team_stats_index, "YEAR"]
+            if year == "2018-19":
+                # found the current year
+                current_assist_average = away_team_stats.at[team_stats_index, "AST"]
+                current_winning_percentage = away_team_stats.at[team_stats_index, "WIN_PCT"]
+                break
+
+        # found assist average and winning percentage, need to encode the matchup
+        # use the label encoder that was fitted earlier
+        global labelEncoder
+        le = labelEncoder
+        transformed_away_matchup = le.transform(["{} @ {}".format(away_team_abbreviation, home_team_abbreviation)])
+
+        print("transformed away matchup is {}".format(transformed_away_matchup))
+
+        # stored all the inputs, can make a prediction now
+        away_team_prediction = away_assists_model.predict([
+            [
+                current_assist_average,
+                current_winning_percentage,
+                transformed_away_matchup
+            ]
+        ])
+
+        # store this prediction in the dictionary that will be returned
+        predictions[away_team_abbreviation] = away_team_prediction[0]
+
+
+        # now that we have the away team prediction, we can predict the assists for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
         home_assists_model = create_assists_model(home_team_abbreviation, home_matchup)
 
 
+
+    return predictions
+
+
+
+
+def create_turnovers_model(team_abbrev, matchup):
+    """
+    Given a specific team and their matchup, predicts the number of turnovers they will have in that game
+    :param team_abbrev:
+    :param matchup:
+    :return:
+    """
+
+
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
 
-    # predictTeamAssists()
-    dtc = create_assists_model("BOS", "BOS @ SAC")
+
+    predictions = predictTeamAssists()
+    print(predictions)
