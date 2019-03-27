@@ -241,6 +241,39 @@ def predictTeamAssists():
 
         home_assists_model = create_assists_model(home_team_abbreviation, home_matchup)
 
+        # now make a prediction for the home team
+        # the model requires assist season average, current winning percentage, and matchup as input variables
+        # get the assist season average
+        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+
+        # iterate over the team stats, find their current assist average and winning percentage
+        current_assist_average = 0
+        current_winning_percentage = 0
+        for team_stats_index, team_stats_row in home_team_stats.iterrows():
+            year = home_team_stats.at[team_stats_index, "YEAR"]
+            if year == "2018-19":
+                # found the current year
+                current_assist_average = home_team_stats.at[team_stats_index, "AST"]
+                current_winning_percentage = home_team_stats.at[team_stats_index, "WIN_PCT"]
+                break
+
+        # found assist average and winning percentage, need to encode the matchup
+        # use the label encoder that was fitted earlier
+        # global labelEncoder
+        le = labelEncoder
+        transformed_home_matchup = le.transform(["{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)])
+
+        # stored all the inputs, can make a prediction now
+        home_team_prediction = home_assists_model.predict([
+            [
+                current_assist_average,
+                current_winning_percentage,
+                transformed_home_matchup
+            ]
+        ])
+
+        # store this prediction in the dictionary that will be returned
+        predictions[home_team_abbreviation] = home_team_prediction[0]
 
 
     return predictions
@@ -251,10 +284,12 @@ def predictTeamAssists():
 def create_turnovers_model(team_abbrev, matchup):
     """
     Given a specific team and their matchup, predicts the number of turnovers they will have in that game
-    :param team_abbrev:
-    :param matchup:
-    :return:
+    :param team_abbrev: a string referring to the team the model is being trained for
+    :param matchup: the matchup to predict the turnovers for
+    :return: a model that predicts the number of turnovers a team will have in their upcoming matchup
     """
+
+
 
 
 if __name__ == "__main__":
