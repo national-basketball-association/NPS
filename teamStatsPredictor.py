@@ -222,7 +222,6 @@ def predictTeamAssists():
         le = labelEncoder
         transformed_away_matchup = le.transform(["{} @ {}".format(away_team_abbreviation, home_team_abbreviation)])
 
-        print("transformed away matchup is {}".format(transformed_away_matchup))
 
         # stored all the inputs, can make a prediction now
         away_team_prediction = away_assists_model.predict([
