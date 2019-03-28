@@ -1,6 +1,5 @@
 import pandas
 from pandas.plotting import scatter_matrix
-import matplotlib.pyplot as plt
 from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -510,12 +509,16 @@ def predictTeamTurnovers():
 
     return predictions
 
-if __name__ == "__main__":
+def predict():
     pandas.set_option('display.max_columns', None)
+    predictions = predictTeamAssists()
 
+    #create_turnovers_model("POR", "POR vs. CHI")
+    teamObj = {}
+    for team in predictions:
+        teamObj[team] = {"assists": str(predictions[team])}
+    turnovers = predictTeamTurnovers()
+    for team in turnovers:
+        teamObj[team]["turnovers"] = str(turnovers[team])
 
-    # predictions = predictTeamAssists()
-    # print(predictions)
-
-    # create_turnovers_model("POR", "POR vs. CHI")
-    print(predictTeamTurnovers())
+    return teamObj

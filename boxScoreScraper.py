@@ -320,13 +320,13 @@ def scrapeTeamStats():
 
 
 
-if __name__ == "__main__":
+def scrape():
     pandas.set_option('display.max_columns', None)
 
-    # scrapeTeamStats()
+    scrapeTeamStats()
     getAllTeamBoxScoresBetweenYears(2015, 2018)
-    # scrapePlayerStats()
-    # scrapeTeamRosters()
+    scrapePlayerStats()
+    scrapeTeamRosters()
 
-    # todays_players = getTodaysPlayers()
-    # scrapeTodaysPlayerStats(todays_players)
+    todays_players = getTodaysPlayers()
+    scrapeTodaysPlayerStats(todays_players)

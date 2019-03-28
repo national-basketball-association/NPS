@@ -1,6 +1,6 @@
 import pandas
 from pandas.plotting import scatter_matrix
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
@@ -51,12 +51,12 @@ def general_preview(dataset):
     print(dataset.groupby("WL").size())
 
 
-def view_basic_plots(dataset):
+#def view_basic_plots(dataset):
     # create box and whisker plots
     # dataset.plot(kind='box', subplots=True, layout=(2, 2), sharex=False, sharey=False)
     # plt.show()
-    scatter_matrix(dataset)
-    plt.show()
+#    scatter_matrix(dataset)
+#    plt.show()
 
 
 def create_model(dataset):
@@ -416,9 +416,3 @@ def predict_todays_games():
     #     print("I think {} will win!".format(x))
 
     return winners
-
-
-if __name__ == "__main__":
-    winners = predict_todays_games()
-    print(winners)
-
