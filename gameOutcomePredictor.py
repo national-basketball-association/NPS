@@ -21,6 +21,8 @@ from sklearn.metrics import f1_score
 import datetime
 from nba_api.stats.endpoints import scoreboardv2
 
+verbose = False
+
 def load_dataset(filename):
     """
     Given a filename pointing to a CSV file that contains game logs for a
@@ -171,12 +173,15 @@ def create_model(dataset):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     predictions = dtc.predict(X_validation)
-    # print(accuracy_score(Y_validation, predictions))
-    # print(confusion_matrix(Y_validation, predictions))
-    # print(classification_report(Y_validation, predictions))
-    # print()
 
-    # print(le.transform(["ATL vs. CHI"]))
+
+    # this is some stuff for displaying statistics for the model
+    if verbose:
+        print(accuracy_score(Y_validation, predictions))
+        print(confusion_matrix(Y_validation, predictions))
+        print(classification_report(Y_validation, predictions))
+        print()
+
 
 
     return dtc
@@ -407,12 +412,13 @@ def predict_todays_games():
 
 
     # should have predicted a winner for all the games, go through and print all the winners to the console
-    for x in winners:
-        print("I think {} will win!".format(x))
+    # for x in winners:
+    #     print("I think {} will win!".format(x))
 
     return winners
 
 
 if __name__ == "__main__":
-    predict_todays_games()
+    winners = predict_todays_games()
+    print(winners)
 
