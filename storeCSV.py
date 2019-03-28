@@ -139,6 +139,68 @@ def storeTeamStats():
                 print(teamObj)
                 col.replace_one({'_id':teamObj['_id']}, teamObj, upsert=True)
 
+def storeBoxScores():
+    col = db["BOX_SCORES"]
+    col2 = db["TEAM_ROSTERS"]
+    for filename in glob.glob('./datasets/*.csv'):
+        with open(filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',', strict=True)
+            teamObj = {}
+            rosterObj = {}
+            line_count = 0
+            for row in csv_file:
+                if line_count == 0:
+                    line_count += 1
+                    teamObj["games"] = []
+                    #print(row)
+                else:
+                    row = row.split(',')
+                    #print(row[1])
+                    teamObj["_id"] = row[1]
+                    teamObj["TEAM_ABBREVIATION"] = row[2]
+                    teamObj["TEAM_NAME"] = row[3]
+                    rosterObj["TEAM_NAME"] = row[3]
+                    rosterObj["_id"] = row[1]
+                    game = {
+                        "SEASON_ID": row[0],
+                        "GAME_ID": row[4],
+                        "GAME_DATE": row[5],
+                        "MATCHUP": row[6],
+                        "WL": row[7],
+                        "MIN": row[8],
+                        "PTS": row[9],
+                        "FGM": row[10],
+                        'FGA': row[11],
+                        "FG_PCT": row[12],
+                        "FG3M": row[13],
+                        "FG3A": row[14],
+                        "FG3_PCT": row[15],
+                        "FTM": row[16],
+                        "FTA": row[17],
+                        "FT_PCT": row[18],
+                        "OREB": row[19],
+                        "DREB": row[20],
+                        "REB": row[21],
+                        "AST": row[22],
+                        "STL": row[23],
+                        "BLK": row[24],
+                        "TOV": row[25],
+                        "PF": row[26],
+                        "PLUS_MINUS": row[27],
+                        "NUM_WINS": row[28],
+                        "NUM_LOSSES": row[29][:-1]
+                    }
+                    teamObj["games"].append(game)
+                    #print(teamObj)
+
+            if teamObj:
+                col.replace_one({'_id':teamObj['_id']}, teamObj, upsert=True)
+                col2.replace_one({'_id':teamObj['_id']}, rosterObj, upsert=True)
+            # print(teamObj["TEAM_NAME"])
+            # print(teamObj["TEAM_ABBREVIATION"])
+            # print(teamObj["_id"])
+            # print(teamObj["games"][0])
+
 
 def storePredictions(teamPredictions):
     if(teamPredictions):
