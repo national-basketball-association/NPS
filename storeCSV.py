@@ -100,6 +100,8 @@ def storeTeamStats():
                     teamObj["teamName"] = row[2]
                     teamObj["years"] = []
                 else:
+                    row = row.split(',')
+
                     year = {
                         "YEAR": row[3],
                         "GP": row[4],
@@ -135,9 +137,9 @@ def storeTeamStats():
                     }
                     teamObj["years"].append(year)
                 line_count += 1
-            if teamObj:
-                print(teamObj)
-                col.replace_one({'_id':teamObj['_id']}, teamObj, upsert=True)
+                if teamObj:
+                    #print(teamObj)
+                    col.replace_one({'_id':teamObj['_id']}, teamObj, upsert=True)
 
 def storeBoxScores():
     col = db["BOX_SCORES"]
@@ -208,7 +210,9 @@ def storePredictions(teamPredictions):
         col.replace_one({"_id": 1000}, teamPredictions, upsert=True)
 
 def store(teamPredictions):
-    print(teamPredictions)
-    storePredictions(teamPredictions)
+#if __name__ == "__main__":
+    #print(teamPredictions)
+    #storePredictions(teamPredictions)
     storePlayerStats()
     storeTeamStats()
+    storeBoxScores()
