@@ -315,9 +315,7 @@ def scrapeTeamStats():
 
         filename = 'datasets/team_stats/{}_Stats_By_Year.csv'.format(team_abbrev)
 
-        recent_team_stats = current_team_stats.tail(5)
-        print(recent_team_stats)
-        print()
+        recent_team_stats = current_team_stats.tail(5) # get the 5 most recent years of stats
 
         # current_team_stats.to_csv(filename, index=None, header=True)
         recent_team_stats.to_csv(filename, index=None, header=True)

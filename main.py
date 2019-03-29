@@ -18,8 +18,6 @@ if __name__ == "__main__":
     for team in teamObj:
         if "winPrediction" not in teamObj[team]:
             teamObj[team]["winPrediction"] = False
-    pp = PrettyPrinter(indent=4)
-    pp.pprint(teamObj)
-
-    sys.exit(1)
+    # pp = PrettyPrinter(indent=4)
+    # pp.pprint(teamObj)
     storeCSV.store(teamObj) # store results into a database
