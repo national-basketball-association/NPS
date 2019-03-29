@@ -4,7 +4,7 @@ import glob
 
 
 #connect to the database
-client = MongoClient('mongodb+srv://rohanrao35:Npsnps407407@cluster0-8eolw.mongodb.net/test?retryWrites=true')
+client = MongoClient("mongodb+srv://rmohamme:green12@cluster0-8eolw.mongodb.net/test?retryWrites=true")
 db = client["NPS"]
 
 
@@ -18,7 +18,7 @@ def storePlayerStats():
             for row in csv_reader:
                 if line_count == 0:
                     #This is the header of the csv_file
-                    #print(f'Coloumn names {", ".join(row)}')
+                    #print(f'Column names {", ".join(row)}')
                     line_count += 1
                     continue
                 elif line_count == 1:
@@ -92,7 +92,7 @@ def storeTeamStats():
                 if line_count == 0:
                     #print(f'Coloumn names {", ".join(row)}')
                     line_count += 1
-                    continue;
+                    continue
                 elif line_count == 1:
                     row = row.split(',')
                     teamObj["_id"] = row[0]

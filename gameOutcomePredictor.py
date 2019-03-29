@@ -20,6 +20,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import f1_score
 import datetime
 from nba_api.stats.endpoints import scoreboardv2
+import boxScoreScraper
+from pprint import PrettyPrinter
 
 verbose = False
 
@@ -377,6 +379,9 @@ def predict_todays_games():
     time.sleep(2)
 
     winners = []
+    team_info = {}
+
+    nba_teams = boxScoreScraper.getAllNbaTeams() # get a list containing information for all the teams
 
 
     for index, row in scoreboard_data.iterrows():
@@ -403,16 +408,94 @@ def predict_todays_games():
 
         prediction = make_prediction(model, matchup, df)
 
-        # print("The predicted point spread for {} was {}".format(away_team_abbreviation, prediction[0]))
 
         if 1 in prediction:
+            # this means that the away team won the game
             winners.append(away_team_abbreviation)
+
+            away_team_info = {} # create a dictionary of information for the winning team
+            # need to store their prediction, their team id, and the team they played
+            away_team_info["winPrediction"] = True # away team was predicted to win
+            away_team_info["homeGame"] = False # were they the home team
+            # iterate over nba_teams to find some information to store
+            away_full_name = ""
+            away_id = None
+            for team in nba_teams:
+                if team["abbreviation"] == away_team_abbreviation:
+                    away_full_name = team["full_name"]
+                    away_id = team["id"]
+                    break
+            away_team_info["full_name"] = away_full_name
+            away_team_info["id"] = away_id
+            # team_info[away_team_abbreviation] = away_team_info
+
+            # now store the required information for the home team
+            home_team_info = {}
+            home_team_info["winPrediction"] = False
+            home_team_info["homeGame"] = True
+            home_full_name = ""
+            home_id = None
+            for team in nba_teams:
+                if team["abbreviation"] == home_team_abbreviation:
+                    home_full_name = team["full_name"]
+                    home_id = team["id"]
+                    break
+            home_team_info["full_name"] = home_full_name
+            home_team_info["id"] = home_id
+            home_team_info["opponentFullName"] = away_full_name
+            team_info[home_team_abbreviation] = home_team_info
+
+            away_team_info["opponentFullName"] = home_full_name
+            team_info[away_team_abbreviation] = away_team_info
+
+
         else:
+            # this means the home team won the game
             winners.append(home_team_abbreviation)
 
+            away_team_info = {}  # create a dictionary of information for the winning team
+            # need to store their prediction, their team id, and the team they played
+            away_team_info["winPrediction"] = False  # away team was predicted to win
+            away_team_info["homeGame"] = False  # were they the home team
+            # iterate over nba_teams to find some information to store
+            away_full_name = ""
+            away_id = None
+            for team in nba_teams:
+                if team["abbreviation"] == away_team_abbreviation:
+                    away_full_name = team["full_name"]
+                    away_id = team["id"]
+                    break
+            away_team_info["full_name"] = away_full_name
+            away_team_info["id"] = away_id
 
-    # should have predicted a winner for all the games, go through and print all the winners to the console
-    # for x in winners:
-    #     print("I think {} will win!".format(x))
+            # now store the required information for the home team
+            home_team_info = {}
+            home_team_info["winPrediction"] = True
+            home_team_info["homeGame"] = True
+            home_full_name = ""
+            home_id = None
+            for team in nba_teams:
+                if team["abbreviation"] == home_team_abbreviation:
+                    home_full_name = team["full_name"]
+                    home_id = team["id"]
+                    break
+            home_team_info["full_name"] = home_full_name
+            home_team_info["id"] = home_id
+            home_team_info["opponentFullName"] = away_full_name
+            team_info[home_team_abbreviation] = home_team_info
 
-    return winners
+            away_team_info["opponentFullName"] = home_full_name
+            team_info[away_team_abbreviation] = away_team_info
+
+
+
+
+    # pp = PrettyPrinter(indent=4)
+    # pp.pprint(team_info)
+    #
+    # print(winners)
+    return team_info
+
+
+if __name__ == "__main__":
+    predictions = predict_todays_games()
