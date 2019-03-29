@@ -373,6 +373,9 @@ def predict_todays_games():
     Creates a model for all the games happening today and tries to predict the outcomes
     :return:
     """
+    # get todays date
+    now = datetime.datetime.now()
+    date = now.strftime("%Y-%m-%d")
 
     # call the scoreboard endpoint to get the games happening today
     scoreboard_data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
@@ -382,6 +385,7 @@ def predict_todays_games():
     team_info = {}
 
     nba_teams = boxScoreScraper.getAllNbaTeams() # get a list containing information for all the teams
+    print(nba_teams)
 
 
     for index, row in scoreboard_data.iterrows():
@@ -420,28 +424,35 @@ def predict_todays_games():
             # iterate over nba_teams to find some information to store
             away_full_name = ""
             away_id = None
+
+            home_full_name = ""
+            home_id = None
             for team in nba_teams:
                 if team["abbreviation"] == away_team_abbreviation:
                     away_full_name = team["full_name"]
                     away_id = team["id"]
-                    break
+                if team["abbreviation"] == home_team_abbreviation:
+                    home_id = team["id"]
+                    home_full_name = team["full_name"]
             away_team_info["full_name"] = away_full_name
             away_team_info["id"] = away_id
+            away_team_info["date"] = date
+            away_team_info["opponentId"] = home_id
             # team_info[away_team_abbreviation] = away_team_info
 
             # now store the required information for the home team
             home_team_info = {}
             home_team_info["winPrediction"] = False
             home_team_info["homeGame"] = True
-            home_full_name = ""
-            home_id = None
-            for team in nba_teams:
-                if team["abbreviation"] == home_team_abbreviation:
-                    home_full_name = team["full_name"]
-                    home_id = team["id"]
-                    break
+            # for team in nba_teams:
+            #     if team["abbreviation"] == home_team_abbreviation:
+            #         home_full_name = team["full_name"]
+            #         home_id = team["id"]
+            #         break
             home_team_info["full_name"] = home_full_name
             home_team_info["id"] = home_id
+            home_team_info["opponentId"] = away_id
+            home_team_info["date"] = date
             home_team_info["opponentFullName"] = away_full_name
             team_info[home_team_abbreviation] = home_team_info
 
@@ -460,28 +471,34 @@ def predict_todays_games():
             # iterate over nba_teams to find some information to store
             away_full_name = ""
             away_id = None
+            home_full_name = ""
+            home_id = None
             for team in nba_teams:
                 if team["abbreviation"] == away_team_abbreviation:
                     away_full_name = team["full_name"]
                     away_id = team["id"]
-                    break
+                if team["abbreviation"] == home_team_abbreviation:
+                    home_full_name = team["full_name"]
+                    home_id = team["id"]
             away_team_info["full_name"] = away_full_name
             away_team_info["id"] = away_id
+            away_team_info["opponentId"] = home_id
+            away_team_info["date"] = date
 
             # now store the required information for the home team
             home_team_info = {}
             home_team_info["winPrediction"] = True
             home_team_info["homeGame"] = True
-            home_full_name = ""
-            home_id = None
-            for team in nba_teams:
-                if team["abbreviation"] == home_team_abbreviation:
-                    home_full_name = team["full_name"]
-                    home_id = team["id"]
-                    break
+            # for team in nba_teams:
+            #     if team["abbreviation"] == home_team_abbreviation:
+            #         home_full_name = team["full_name"]
+            #         home_id = team["id"]
+            #         break
             home_team_info["full_name"] = home_full_name
             home_team_info["id"] = home_id
+            home_team_info["opponentId"] = away_id
             home_team_info["opponentFullName"] = away_full_name
+            home_team_info["date"] = date
             team_info[home_team_abbreviation] = home_team_info
 
             away_team_info["opponentFullName"] = home_full_name
@@ -489,13 +506,10 @@ def predict_todays_games():
 
 
 
-
-    # pp = PrettyPrinter(indent=4)
-    # pp.pprint(team_info)
-    #
-    # print(winners)
     return team_info
 
 
 if __name__ == "__main__":
     predictions = predict_todays_games()
+    pp = PrettyPrinter(indent=4)
+    pp.pprint(predictions)

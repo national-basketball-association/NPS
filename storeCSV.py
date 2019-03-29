@@ -1,7 +1,8 @@
 import csv
 from pymongo import MongoClient
 import glob
-
+import sys
+from pprint import PrettyPrinter
 
 #connect to the database
 client = MongoClient("mongodb+srv://rmohamme:green12@cluster0-8eolw.mongodb.net/test?retryWrites=true")
@@ -74,10 +75,9 @@ def storePlayerStats():
                 # print(row[i])
                 # i += 1
                 #print("\n")
-                #exit(1)
                 print(playerObj)
 
-                #exit(1)
+
                 col.replace_one({'_id':playerObj['_id']}, playerObj, upsert=True)
 
 
@@ -203,15 +203,104 @@ def storeBoxScores():
             # print(teamObj["_id"])
             # print(teamObj["games"][0])
 
+#
+# def storePredictions(teamPredictions):
+#     """
+#     use the other one
+#     :param teamPredictions:
+#     :return:
+#     """
+#     pp = PrettyPrinter(indent=4)
+#     pp.pprint(teamPredictions)
+#     sys.exit(1)
+#     if(teamPredictions):
+#         col = db["TEAM_PREDICTIONS"]
+#         col.replace_one({"_id": 1000}, teamPredictions, upsert=True)
 
-def storePredictions(teamPredictions):
-    if(teamPredictions):
+def storeTeamPredictions(teamPredictions):
+    """
+    Stores the predictions made by NPS system for every team playing tonight in MongoDB
+    Every team should have its own document, and the document should be updated every time
+    that team plays a game and receives new predictions
+    :param teamPredictions: a nested dictionary, mapping team abbreviations to information, such as opponent and stats
+    :return:
+    """
+    global db
+    pp = PrettyPrinter(indent=4)
+
+    # iterate over the team predictions and add them to the database
+    # each team should be its own document
+    for key, value in teamPredictions.items():
+        team_abbreviation = key
+        team_info = value
+        team_id = value["id"]
+        del value["id"]
+        # print(value)
         col = db["TEAM_PREDICTIONS"]
-        col.replace_one({"_id": 1000}, teamPredictions, upsert=True)
+
+
+
+        document = col.find_one({"_id": team_id}) # get the current document associated with this team in the db
+
+
+
+        if document == None:
+            # there is no document for this team, need to make one from scratch
+            print("There is no document for {}!".format(value["full_name"]))
+
+            predictions = []  # a list of the predictions made for this team, each prediction should be a dictionary
+
+            to_insert = {}  # the dictionary to insert in the database
+
+            to_insert["full_name"] = value["full_name"]
+
+            current_prediction = {}
+            current_prediction["winPrediction"] = value["winPrediction"]
+            current_prediction["homeGame"] = value["homeGame"]
+            current_prediction["opponentFullName"] = value["opponentFullName"]
+            current_prediction["opponentId"] = value["opponentId"]
+            current_prediction["predictedAssists"] = value["predictedAssists"]
+            current_prediction["predictedTurnovers"] = value["predictedTurnovers"]
+            current_prediction["date"] = value["date"]
+            # finished formatting the most recent prediction made for this team
+
+            predictions.append(current_prediction)
+
+            to_insert["predictions"] = predictions
+
+            # the document to insert should have been formatted, try inserting into the database
+            col.replace_one({"_id": team_id}, to_insert, upsert=True)
+
+            pass
+        else:
+            # get the current predictions that are stored in the database
+            stored_predictions = document["predictions"] # this should be an array
+
+            # format the most recent prediction into a dictionary
+            current_prediction = {}
+            current_prediction["winPrediction"] = value["winPrediction"]
+            current_prediction["homeGame"] = value["homeGame"]
+            current_prediction["opponentFullName"] = value["opponentFullName"]
+            current_prediction["opponentId"] = value["opponentId"]
+            current_prediction["predictedAssists"] = value["predictedAssists"]
+            current_prediction["predictedTurnovers"] = value["predictedTurnovers"]
+            current_prediction["date"] = value["date"]
+
+
+            stored_predictions.append(current_prediction)
+            document["predictions"] = stored_predictions
+            # the predictions array for this team has been updated with the most recent game
+
+
+            # should be able to insert it into the database
+            col.replace_one({"_id": team_id}, document, upsert=True)
+
+
 
 def store(teamPredictions):
-    #print(teamPredictions)
-    #storePredictions(teamPredictions)
+    storeTeamPredictions(teamPredictions)
+    # sys.exit(1)
+
     storePlayerStats()
     storeTeamStats()
     storeBoxScores()
