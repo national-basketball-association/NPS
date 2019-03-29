@@ -303,7 +303,7 @@ def scrapeTeamStats():
     """
     teams = getAllNbaTeams()
 
-    # iterate overa ll the teams
+    # iterate over all the teams
     for team in teams:
         team_id = team['id']
         team_abbrev = team['abbreviation']
@@ -315,7 +315,10 @@ def scrapeTeamStats():
 
         filename = 'datasets/team_stats/{}_Stats_By_Year.csv'.format(team_abbrev)
 
-        current_team_stats.to_csv(filename, index=None, header=True)
+        recent_team_stats = current_team_stats.tail(5) # get the 5 most recent years of stats
+
+        # current_team_stats.to_csv(filename, index=None, header=True)
+        recent_team_stats.to_csv(filename, index=None, header=True)
         print("Finished scraping team stats for {}".format(team_abbrev))
 
 
@@ -324,9 +327,12 @@ def scrape():
     pandas.set_option('display.max_columns', None)
 
     scrapeTeamStats()
-    getAllTeamBoxScoresBetweenYears(2015, 2018)
-    scrapePlayerStats()
-    scrapeTeamRosters()
+    # getAllTeamBoxScoresBetweenYears(2015, 2018)
+    # scrapePlayerStats()
+    # scrapeTeamRosters()
 
-    todays_players = getTodaysPlayers()
-    scrapeTodaysPlayerStats(todays_players)
+    # todays_players = getTodaysPlayers()
+    # scrapeTodaysPlayerStats(todays_players)
+
+if __name__ == "__main__":
+    scrape()

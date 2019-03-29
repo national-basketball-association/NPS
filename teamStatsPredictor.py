@@ -513,7 +513,6 @@ def predict():
     pandas.set_option('display.max_columns', None)
     predictions = predictTeamAssists()
 
-    #create_turnovers_model("POR", "POR vs. CHI")
     teamObj = {}
     for team in predictions:
         teamObj[team] = {"assists": str(predictions[team])}
@@ -522,3 +521,6 @@ def predict():
         teamObj[team]["turnovers"] = str(turnovers[team])
 
     return teamObj
+
+if __name__ == "__main__":
+    predict()
