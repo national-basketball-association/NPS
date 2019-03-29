@@ -520,8 +520,6 @@ def predict():
     for team in turnovers:
         teamObj[team]["turnovers"] = str(turnovers[team])
 
-    print(teamObj)
-
     return teamObj
 
 if __name__ == "__main__":
