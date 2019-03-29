@@ -3,6 +3,9 @@ import csv_cleaner
 import gameOutcomePredictor
 import teamStatsPredictor
 import storeCSV
+import sys
+from pprint import PrettyPrinter
+
 
 
 if __name__ == "__main__":
@@ -15,4 +18,8 @@ if __name__ == "__main__":
     for team in teamObj:
         if "winPrediction" not in teamObj[team]:
             teamObj[team]["winPrediction"] = False
+    pp = PrettyPrinter(indent=4)
+    pp.pprint(teamObj)
+
+    sys.exit(1)
     storeCSV.store(teamObj) # store results into a database
