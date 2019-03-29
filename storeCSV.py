@@ -210,7 +210,6 @@ def storePredictions(teamPredictions):
         col.replace_one({"_id": 1000}, teamPredictions, upsert=True)
 
 def store(teamPredictions):
-#if __name__ == "__main__":
     #print(teamPredictions)
     #storePredictions(teamPredictions)
     storePlayerStats()

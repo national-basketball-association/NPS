@@ -9,15 +9,18 @@ from pprint import PrettyPrinter
 
 
 if __name__ == "__main__":
+    pp = PrettyPrinter(indent=4)
     #boxScoreScraper.scrape() # gets the players playing today
     #csv_cleaner.clean()
-    predictedWinners = gameOutcomePredictor.predict_todays_games() #An array of predicted winners
+    teamInfo = gameOutcomePredictor.predict_todays_games() #An array of predicted winners
     teamObj = teamStatsPredictor.predict() #An object of predicted statistics per teams
-    for winner in predictedWinners:
-        teamObj[winner]["winPrediction"] = True
-    for team in teamObj:
-        if "winPrediction" not in teamObj[team]:
-            teamObj[team]["winPrediction"] = False
-    # pp = PrettyPrinter(indent=4)
-    # pp.pprint(teamObj)
-    storeCSV.store(teamObj) # store results into a database
+
+
+    # iterate over teamObj and add the predicted stats into teamInfo
+    for key, value in teamObj.items():
+        currentTeamPredictions = value
+        teamInfo[key]["predictedAssists"] = value["assists"]
+        teamInfo[key]["predictedTurnovers"] = value["turnovers"]
+
+
+    storeCSV.store(teamInfo) # store results into a database
