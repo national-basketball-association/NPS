@@ -262,6 +262,8 @@ def storeTeamPredictions(teamPredictions):
             current_prediction["predictedAssists"] = value["predictedAssists"]
             current_prediction["predictedTurnovers"] = value["predictedTurnovers"]
             current_prediction["predictedRebounds"] = value["predictedRebounds"]
+            current_prediction["predictedBlocks"] = value["predictedBlocks"]
+            current_prediction["predictedAssistTurnoverRatio"] = value["predictedAssists"] / value["predictedTurnovers"]
             current_prediction["date"] = value["date"]
             # finished formatting the most recent prediction made for this team
 
@@ -286,6 +288,8 @@ def storeTeamPredictions(teamPredictions):
             current_prediction["predictedAssists"] = value["predictedAssists"]
             current_prediction["predictedTurnovers"] = value["predictedTurnovers"]
             current_prediction["predictedRebounds"] = value["predictedRebounds"]
+            current_prediction["predictedBlocks"] = value["predictedBlocks"]
+            current_prediction["predictedAssistTurnoverRatio"] = value["predictedAssists"]/value["predictedTurnovers"]
             current_prediction["date"] = value["date"]
 
 
