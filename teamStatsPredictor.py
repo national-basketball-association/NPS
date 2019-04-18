@@ -736,6 +736,9 @@ def predictTeamRebounds():
     # return the dictionary of team abbreviations and their rebound predictions
     return predictions
 
+
+def create_blocks_model()
+
 def predict():
     pandas.set_option('display.max_columns', None)
     predictions = predictTeamAssists()
