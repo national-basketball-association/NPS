@@ -965,6 +965,10 @@ def predict_team_blocks():
 
 
 def predict():
+    """
+    Calls helper methods to make predictions for all the team statistics that are needed
+    :return: a dictionary mapping teams to the stats they are predicted to achieve in their next matchup
+    """
     pandas.set_option('display.max_columns', None)
     predictions = predictTeamAssists()
 
@@ -972,13 +976,20 @@ def predict():
     for team in predictions:
         teamObj[team] = {"assists": str(predictions[team])}
 
+    # add the turnover predictions
     turnovers = predictTeamTurnovers()
     for team in turnovers:
         teamObj[team]["turnovers"] = str(turnovers[team])
 
+    # add the rebound predictions
     rebounds = predictTeamRebounds()
     for team in rebounds:
         teamObj[team]["rebounds"] = str(rebounds[team])
+
+    # add the block predictions
+    blocks = predict_team_blocks()
+    for team in blocks:
+        teamObj[team]["blocks"] = str(blocks[team])
 
     return teamObj
 
