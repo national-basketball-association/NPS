@@ -23,6 +23,7 @@ if __name__ == "__main__":
         teamInfo[key]["predictedTurnovers"] = value["turnovers"]
         teamInfo[key]["predictedRebounds"] = value["rebounds"]
         teamInfo[key]["predictedBlocks"] = value["blocks"]
+        teamInfo[key]["predictedSteals"] = value["steals"]
 
 
     storeCSV.store(teamInfo) # store results into a database
