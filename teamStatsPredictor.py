@@ -1217,14 +1217,17 @@ def predict():
     for team in blocks:
         teamObj[team]["blocks"] = str(blocks[team])
 
-        
+    # add the steals predictions
+    steals = predict_team_steals()
+    for team in steals:
+        teamObj[team]["steals"] = str(steals[team])
 
     return teamObj
 
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
-    create_steals_model("BOS")
-    # predictions = predict_team_blocks()
-    #
-    # pp = pprint.PrettyPrinter(indent=4)
-    # pp.pprint(predictions)
+    # create_steals_model("BOS")
+    predictions = predict_team_steals()
+
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(predictions)
