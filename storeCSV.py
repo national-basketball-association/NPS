@@ -275,6 +275,7 @@ def storeTeamPredictions(teamPredictions):
             current_prediction["predictedAssistTurnoverRatio"] = int(value["predictedAssists"]) / int(value["predictedTurnovers"])
             current_prediction["predictedSteals"] = value["predictedSteals"]
             current_prediction["predictedFouls"] = value["predictedFouls"]
+            current_prediction["predictedThreePtPercentage"] = value["predictedThreePtPercentage"]
             current_prediction["date"] = value["date"]
             # finished formatting the most recent prediction made for this team
 
@@ -304,6 +305,7 @@ def storeTeamPredictions(teamPredictions):
                 value["predictedTurnovers"])
             current_prediction["predictedSteals"] = value["predictedSteals"]
             current_prediction["predictedFouls"] = value["predictedFouls"]
+            current_prediction["predictedThreePtPercentage"] = value["predictedThreePtPercentage"]
             current_prediction["date"] = value["date"]
 
 
