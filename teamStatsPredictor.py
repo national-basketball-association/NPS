@@ -1099,24 +1099,23 @@ def predict_team_steals():
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
 
-        # need to generate an assists model for both of those teams
+        # need to generate an steals model for both of those teams
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
         filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        # away_rebounds_model = create_rebound_model(away_team_abbreviation, away_matchup)
         away_steals_model = create_steals_model(away_team_abbreviation)
 
         # we now have a model for both the home and away team in the current matchup
         # use the model to make a prediction
         # first make a prediction for the away team
-        # the model requires rebounds season average, current winning percentage, and matchup as input variables
-        # get the rebounds season average
+        # the model requires steals season average, current winning percentage, and matchup as input variables
+        # get the steals season average
         away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current rebound average and winning percentage
+        # iterate over the team stats, find their current steal average and winning percentage
         current_steal_average = 0
         current_winning_pct = 0
 
@@ -1126,10 +1125,10 @@ def predict_team_steals():
                 # found the current year
                 current_steal_average = away_team_stats.at[team_stats_index, "STL"]
 
-                current_winning_percentage = away_team_stats.at[team_stats_index, "WIN_PCT"]
+                current_winning_pct = away_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
-        # found the turnover average and winning percentage
+        # found the steal average and winning percentage
         # encode the matchup using the global labelEncoder
         global labelEncoder
         le = labelEncoder
@@ -1139,33 +1138,32 @@ def predict_team_steals():
         away_team_prediction = away_steals_model.predict([
             [
                 current_steal_average,
-                current_winning_percentage,
+                current_winning_pct,
                 transformed_away_matchup
             ]
         ])
         # store this prediction in the dictionary that will be returned
         predictions[away_team_abbreviation] = away_team_prediction[0]
 
-        # now that we have the away team prediction, we can predict the assists for the home team
+        # now that we have the away team prediction, we can predict the steals for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
-        # home_rebound_model = create_rebound_model(home_team_abbreviation, home_matchup)
         home_steals_model = create_steals_model(home_team_abbreviation)
 
         # now make a prediction for the home team
-        # the model requires assist season average, current winning percentage, and matchup as input variables
-        # get the assist season average
+        # the model requires steal season average, current winning percentage, and matchup as input variables
+        # get the steal season average
         home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current assist average and winning percentage
+        # iterate over the team stats, find their current steal average and winning percentage
         current_steal_average = 0
-        current_winning_percentage = 0
+        current_winning_pct = 0
         for team_stats_index, team_stats_row in home_team_stats.iterrows():
             year = home_team_stats.at[team_stats_index, "YEAR"]
             if year == "2018-19":
                 # found the current year
                 current_steal_average = home_team_stats.at[team_stats_index, "STL"]
-                current_winning_percentage = home_team_stats.at[team_stats_index, "WIN_PCT"]
+                current_winning_pct = home_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
         # found the rebound average and winning percentage, need to encode the matchup
@@ -1178,7 +1176,7 @@ def predict_team_steals():
         home_team_prediction = home_steals_model.predict([
             [
                 current_steal_average,
-                current_winning_percentage,
+                current_winning_pct,
                 transformed_home_matchup
             ]
         ])
@@ -1186,7 +1184,7 @@ def predict_team_steals():
         # store this prediction in the dictionary that will be returned
         predictions[home_team_abbreviation] = home_team_prediction[0]
 
-    # return the dictionary of team abbreviations and their rebound predictions
+    # return the dictionary of team abbreviations and their steal predictions
     return predictions
 
 
@@ -1414,6 +1412,16 @@ def predict_team_fouls():
 
     # return the dictionary of team abbreviations and their rebound predictions
     return predictions
+
+
+
+def create_three_point_model(team_abbrev):
+    """
+    Given an NBA team, creates a model that can be used to predict their three point percentage against another NBA
+    team
+    :param team_abbrev: 3 letter abbreviation used to refer to an NBA team, such as BOS or ATL
+    :return:
+    """
 
 
 def predict():
