@@ -1460,4 +1460,4 @@ def predict():
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
     # create_steals_model("BOS")
-    create_fouls_model("BOS")
+    # create_fouls_model("BOS")
