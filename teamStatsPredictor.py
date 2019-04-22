@@ -1562,7 +1562,7 @@ def predict_team_three_pt_percentage():
         # use the model to make a prediction
         # first make a prediction for the away team
         # the model requires 3pt% season average, current winning percentage, and matchup as input variables
-        # get the fouls season average
+        # get the 3pt season average
         away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
         # iterate over the team stats, find their current fouls average and winning percentage
@@ -1578,7 +1578,7 @@ def predict_team_three_pt_percentage():
                 current_winning_pct = away_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
-        # found the fouls average and winning percentage
+        # found the 3pt average and winning percentage
         # encode the matchup using the global labelEncoder
         global labelEncoder
         le = labelEncoder
@@ -1601,8 +1601,8 @@ def predict_team_three_pt_percentage():
         home_three_pt_model = create_three_point_model(home_team_abbreviation)
 
         # now make a prediction for the home team
-        # the model requires pf season average, current winning percentage, and matchup as input variables
-        # get the pf season average
+        # the model requires 3pt season average, current winning percentage, and matchup as input variables
+        # get the 3pt season average
         home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
         # iterate over the team stats, find their current foul average and winning percentage
@@ -1755,6 +1755,117 @@ def create_free_throw_model(team_abbrev):
 
     return clf
 
+def predict_team_free_throw_pct():
+    """
+        Predicts the free throw percentage for all the teams playing today
+        :return: dictionary mapping team abbreviations to their predicted ft %
+        """
+    # call the scoreboard endpoint to get the games happening today
+    scoreboard_data = scoreboardv2.ScoreboardV2().get_data_frames()[0]
+    time.sleep(2)
+
+    predictions = {}
+
+    for index, row in scoreboard_data.iterrows():
+        # can get the teams playing by getting the GAMECODE of the row
+        gamecode = row["GAMECODE"]
+        tokens = gamecode.split("/")
+
+        teams_playing_str = tokens[1]
+
+        # slice the string to get the abbreviations of the teams playing
+        away_team_abbreviation = teams_playing_str[:3]
+        home_team_abbreviation = teams_playing_str[-3:]
+
+        # need to generate a ft% model for both of those teams
+        # format a matchup string using the abbreviations
+        away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
+        # get the dataframe for the away team
+        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        df = load_dataset(filename)  # load a dataframe for the teams data
+
+        away_ft_model = create_free_throw_model(away_team_abbreviation)
+
+        # we now have a model for both the home and away team in the current matchup
+        # use the model to make a prediction
+        # first make a prediction for the away team
+        # the model requires ft% season average, current winning percentage, and matchup as input variables
+        # get the ft season average
+        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+
+        # iterate over the team stats, find their current fouls average and winning percentage
+        current_ft_average = 0
+        current_winning_pct = 0
+
+        for team_stats_index, team_stats_row in away_team_stats.iterrows():
+            year = away_team_stats.at[team_stats_index, "YEAR"]
+            if year == "2018-19":
+                # found the current year
+                current_ft_average = away_team_stats.at[team_stats_index, "FT_PCT"]
+
+                current_winning_pct = away_team_stats.at[team_stats_index, "WIN_PCT"]
+                break
+
+        # found the ft average and winning percentage
+        # encode the matchup using the global labelEncoder
+        global labelEncoder
+        le = labelEncoder
+        transformed_away_matchup = le.transform(["{} @ {}".format(away_team_abbreviation, home_team_abbreviation)])
+
+        # stored all the inputs, can make a prediction now
+        away_team_prediction = away_ft_model.predict([
+            [
+                current_ft_average,
+                current_winning_pct,
+                transformed_away_matchup
+            ]
+        ])
+        # store this prediction in the dictionary that will be returned
+        predictions[away_team_abbreviation] = away_team_prediction[0]
+
+        # now that we have the away team prediction, we can predict the 3pt% for the home team
+        home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
+
+        home_ft_model = create_free_throw_model(home_team_abbreviation)
+
+        # now make a prediction for the home team
+        # the model requires ft season average, current winning percentage, and matchup as input variables
+        # get the ft season average
+        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+
+        # iterate over the team stats, find their current foul average and winning percentage
+        # current_three_pt_average = 0
+        current_ft_average = 0
+        current_winning_pct = 0
+        for team_stats_index, team_stats_row in home_team_stats.iterrows():
+            year = home_team_stats.at[team_stats_index, "YEAR"]
+            if year == "2018-19":
+                # found the current year
+                current_ft_average = home_team_stats.at[team_stats_index, "FT_PCT"]
+                current_winning_pct = home_team_stats.at[team_stats_index, "WIN_PCT"]
+                break
+
+        # found the ft average and winning percentage, need to encode the matchup
+        # use the global label encoder
+
+        le = labelEncoder
+        transformed_home_matchup = le.transform(["{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)])
+
+        # stored all the inputs, can make a prediction now
+        home_team_prediction = home_ft_model.predict([
+            [
+                current_ft_average,
+                current_winning_pct,
+                transformed_home_matchup
+            ]
+        ])
+
+        # store this prediction in the dictionary that will be returned
+        predictions[home_team_abbreviation] = home_team_prediction[0]
+
+    # return the dictionary of team abbreviations and their rebound predictions
+    return predictions
+
 def predict():
     """
     Calls helper methods to make predictions for all the team statistics that are needed
@@ -1799,8 +1910,16 @@ def predict():
         value = round(value, 3)
         teamObj[team]["three_point_percentage"] = str(value)
 
+    # add the ft% predictions
+    ft_percentage = predict_team_free_throw_pct()
+    for team in ft_percentage:
+        value = ft_percentage[team]
+        value = round(value, 3)
+        teamObj[team]["ft_percentage"] = str(value)
+
     return teamObj
 
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
-    create_free_throw_model("BOS")
+
+    # predictions = predict()
