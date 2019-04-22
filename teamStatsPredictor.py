@@ -1479,7 +1479,6 @@ def create_three_point_model(team_abbrev):
             if year == season:
                 # get the 3pt% and win % from this year
                 three_point_average = stats_df.at[stats_index, "FG3_PCT"]
-                print("three point avg is {}".format(three_point_average))
                 win_pct = stats_df.at[stats_index, "WIN_PCT"]
 
                 # got the values needed from this season, now add them to the game log dataframe
@@ -1503,9 +1502,6 @@ def create_three_point_model(team_abbrev):
     log_df["MATCHUPS_TRANSFORMED"] = matchups_transformed
 
     array = log_df.values
-
-    print(log_df.head(10))
-    sys.exit(1)
 
     # now format the input and output feature vectors
     X = array[:, [30, 31, 32]]  # this is the 3pt% season average, win percentage, and matchup
