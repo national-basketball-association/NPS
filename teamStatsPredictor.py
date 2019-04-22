@@ -1279,8 +1279,6 @@ def create_fouls_model(team_abbrev):
 
     array = log_df.values
 
-    print(log_df.head(1))
-    sys.exit(1)
 
     # now format the input and output feature vectors
     X = array[:, [30, 31, 32]]  # this is the pf season average, win percentage, and matchup
