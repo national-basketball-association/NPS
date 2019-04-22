@@ -1637,6 +1637,124 @@ def predict_team_three_pt_percentage():
     # return the dictionary of team abbreviations and their rebound predictions
     return predictions
 
+
+def create_free_throw_model(team_abbrev):
+    """
+        Given an NBA team, creates a model that can be used to predict their free throw percentage against another NBA
+        team
+        :param team_abbrev: 3 letter abbreviation used to refer to an NBA team, such as BOS or ATL
+        :return: <LinearRegression> model that can predict their free throw percentage against a team
+        """
+    # first need to load the game logs
+    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_df = load_dataset(log_filename)
+
+    # now load the team stats
+    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_df = load_dataset(stats_filename)
+
+    # average ft% and win% are in the stats file, so we need to add that to the log dataframe
+    log_df["FT_SZN_AVG"] = 0.0
+    log_df["WIN_PCT"] = 0.0
+
+    for index, row in log_df.iterrows():
+        game_date = log_df.at[index, "GAME_DATE"]
+
+        tokens = game_date.split("-")
+        year = tokens[0]
+        month = tokens[1]
+
+        season = ""
+
+        # determine the formatting of the season by checking whether the month was in the first or second half
+        # of the year
+
+        if int(month) >= 6:
+            # this is the beginning of a season
+
+
+            beginning_year = int(year)
+
+            end_year = int(year) + 1
+
+            end_year_str = (str(end_year))[-2:]
+
+            season = "{}-{}".format(str(beginning_year), end_year_str)
+
+        else:
+            # this is in the end of a season
+
+            end_year = str(year)
+
+            beginning_year = int(year) - 1
+
+            beginning_year_str = str(beginning_year)
+
+            end_year = end_year[-2:]
+
+            season = "{}-{}".format(beginning_year_str, end_year)
+
+            # the season should be formatted according to the format in the team stats file
+
+            # need to get the team's stats recorded for season
+
+        free_throw_average = 0.0
+
+        for stats_index, stats_row in stats_df.iterrows():
+            year = stats_df.at[stats_index, "YEAR"]
+            if year == season:
+                # get the ft% and win % from this year
+                free_throw_average = stats_df.at[stats_index, "FT_PCT"]
+                win_pct = stats_df.at[stats_index, "WIN_PCT"]
+
+                # got the values needed from this season, now add them to the game log dataframe
+                log_df.at[index, "FT_SZN_AVG"] = float(free_throw_average)
+                log_df.at[index, "WIN_PCT"] = win_pct
+
+                break
+            else:
+                continue
+
+    # need to encode the matchup feature because it is a categorical variable
+    le = LabelEncoder()
+    matchups = (log_df["MATCHUP"].values).tolist()
+    le.fit(matchups)  # fitting the label encoder to the list of different matchups
+    global labelEncoder
+    labelEncoder = le
+
+    # now get a transformation of the matchups column
+    matchups_transformed = le.transform(matchups)
+
+    log_df["MATCHUPS_TRANSFORMED"] = matchups_transformed
+
+    array = log_df.values
+
+    # now format the input and output feature vectors
+    X = array[:, [30, 31, 32]]  # this is the ft% season average, win percentage, and matchup
+    Y = array[:, 18]  # this should be the ft% total for a game
+    Y = Y.astype('float')
+
+    print(log_df.head(1))
+
+    # now split into training and testing splits
+    validation_size = 0.20
+    seed = 7
+    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size,
+                                                                                    random_state=seed)
+    # set the type of scoring
+    scoring = 'accuracy'
+
+    clf = LinearRegression()  # have to use a linear regression algorithm in order to predict floats
+    clf.fit(X_train, Y_train)
+    if verbose:
+        predictions = clf.predict(X_validation)
+        print(accuracy_score(Y_validation, predictions))
+        print(confusion_matrix(Y_validation, predictions))
+        print(classification_report(Y_validation, predictions))
+        print()
+
+    return clf
+
 def predict():
     """
     Calls helper methods to make predictions for all the team statistics that are needed
@@ -1685,5 +1803,4 @@ def predict():
 
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
-    # create_steals_model("BOS")
-    # create_fouls_model("BOS")
+    create_free_throw_model("BOS")
