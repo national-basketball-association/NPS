@@ -36,7 +36,7 @@ def load_dataset(filename):
     return dataset
 
 
-def create_assists_model(team_abbrev, matchup):
+def create_assists_model(team_abbrev):
     """
     Given a dataframe
     :param team_abbrev: string representing the team to generate a model that predicts their assists in a game
@@ -193,7 +193,7 @@ def predictTeamAssists():
         filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        away_assists_model = create_assists_model(away_team_abbreviation, away_matchup)
+        away_assists_model = create_assists_model(away_team_abbreviation)
 
 
 
@@ -239,7 +239,7 @@ def predictTeamAssists():
         # now that we have the away team prediction, we can predict the assists for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
-        home_assists_model = create_assists_model(home_team_abbreviation, home_matchup)
+        home_assists_model = create_assists_model(home_team_abbreviation)
 
         # now make a prediction for the home team
         # the model requires assist season average, current winning percentage, and matchup as input variables
@@ -296,7 +296,7 @@ def create_turnovers_model(team_abbrev, matchup):
     stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
     stats_df = load_dataset(stats_filename)
 
-    # num assists and win% are in the stats file, so we need to add that to the log dataframe
+    # num turnovers and win% are in the stats file, so we need to add that to the log dataframe
     log_df["TOV_SZN_AVG"] = 0
     log_df["WIN_PCT"] = 0.0
 
@@ -422,7 +422,7 @@ def predictTeamTurnovers():
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
 
-        # need to generate an assists model for both of those teams
+        # need to generate an turnovers model for both of those teams
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
@@ -440,7 +440,7 @@ def predictTeamTurnovers():
 
         # iterate over the team stats, find their current turnover average and winning percentage
         current_turnover_average = 0
-        current_winning_pct = 0
+        current_winning_percentage = 0
 
         for team_stats_index, team_stats_row in away_team_stats.iterrows():
             year = away_team_stats.at[team_stats_index, "YEAR"]
@@ -468,17 +468,17 @@ def predictTeamTurnovers():
         # store this prediction in the dictionary that will be returned
         predictions[away_team_abbreviation] = away_team_prediction[0]
 
-        # now that we have the away team prediction, we can predict the assists for the home team
+        # now that we have the away team prediction, we can predict the turnovers for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
         home_turnovers_model = create_turnovers_model(home_team_abbreviation, home_matchup)
 
         # now make a prediction for the home team
-        # the model requires assist season average, current winning percentage, and matchup as input variables
-        # get the assist season average
+        # the model requires turnovers season average, current winning percentage, and matchup as input variables
+        # get the turnovers season average
         home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current assist average and winning percentage
+        # iterate over the team stats, find their current turnovers average and winning percentage
         current_turnover_average = 0
         current_winning_percentage = 0
         for team_stats_index, team_stats_row in home_team_stats.iterrows():
@@ -526,7 +526,7 @@ def create_rebound_model(team_abbrev, matchup):
     stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
     stats_df = load_dataset(stats_filename)
 
-    # num assists and win% are in the stats file, so we need to add that to the log dataframe
+    # num rebound and win% are in the stats file, so we need to add that to the log dataframe
     log_df["REB_SZN_AVG"] = 0
     log_df["WIN_PCT"] = 0.0
 
@@ -574,7 +574,7 @@ def create_rebound_model(team_abbrev, matchup):
         for stats_index, stats_row in stats_df.iterrows():
             year = stats_df.at[stats_index, "YEAR"]
             if year == season:
-                # get the turnovers and win % from this year
+                # get the rebounds and win % from this year
                 reb_per_game = stats_df.at[stats_index, "REB"]
                 win_pct = stats_df.at[stats_index, "WIN_PCT"]
 
@@ -648,7 +648,7 @@ def predictTeamRebounds():
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
 
-        # need to generate an assists model for both of those teams
+        # need to generate an rebounds model for both of those teams
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
@@ -666,7 +666,7 @@ def predictTeamRebounds():
 
         # iterate over the team stats, find their current rebound average and winning percentage
         current_rebound_average = 0
-        current_winning_pct = 0
+        current_winning_percentage = 0
 
         for team_stats_index, team_stats_row in away_team_stats.iterrows():
             year = away_team_stats.at[team_stats_index, "YEAR"]
@@ -676,7 +676,7 @@ def predictTeamRebounds():
                 current_winning_percentage = away_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
-        # found the turnover average and winning percentage
+        # found the rebound average and winning percentage
         # encode the matchup using the global labelEncoder
         global labelEncoder
         le = labelEncoder
@@ -693,18 +693,17 @@ def predictTeamRebounds():
         # store this prediction in the dictionary that will be returned
         predictions[away_team_abbreviation] = away_team_prediction[0]
 
-        # now that we have the away team prediction, we can predict the assists for the home team
+        # now that we have the away team prediction, we can predict the rebounds for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
         home_rebound_model = create_rebound_model(home_team_abbreviation, home_matchup)
 
         # now make a prediction for the home team
-        # the model requires assist season average, current winning percentage, and matchup as input variables
-        # get the assist season average
+        # the model requires rebound season average, current winning percentage, and matchup as input variables
+        # get the rebound season average
         home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current assist average and winning percentage
-        # current_turnover_average = 0
+        # iterate over the team stats, find their current rebound average and winning percentage
         current_rebound_average = 0
         current_winning_percentage = 0
         for team_stats_index, team_stats_row in home_team_stats.iterrows():
@@ -753,7 +752,7 @@ def create_blocks_model(team_abbrev):
     stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
     stats_df = load_dataset(stats_filename)
 
-    # num assists and win% are in the stats file, so we need to add that to the log dataframe
+    # num blocks and win% are in the stats file, so we need to add that to the log dataframe
     log_df["BLK_SZN_AVG"] = 0
     log_df["WIN_PCT"] = 0.0
 
@@ -801,7 +800,7 @@ def create_blocks_model(team_abbrev):
         for stats_index, stats_row in stats_df.iterrows():
             year = stats_df.at[stats_index, "YEAR"]
             if year == season:
-                # get the turnovers and win % from this year
+                # get the blocks and win % from this year
                 blk_per_game = stats_df.at[stats_index, "BLK"]
                 win_pct = stats_df.at[stats_index, "WIN_PCT"]
 
@@ -874,26 +873,25 @@ def predict_team_blocks():
         away_team_abbreviation = teams_playing_str[:3]
         home_team_abbreviation = teams_playing_str[-3:]
 
-        # need to generate an assists model for both of those teams
+        # need to generate an blocks model for both of those teams
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
         filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        # away_rebounds_model = create_rebound_model(away_team_abbreviation, away_matchup)
         away_blocks_model = create_blocks_model(away_team_abbreviation)
 
         # we now have a model for both the home and away team in the current matchup
         # use the model to make a prediction
         # first make a prediction for the away team
-        # the model requires rebounds season average, current winning percentage, and matchup as input variables
-        # get the rebounds season average
+        # the model requires blocks season average, current winning percentage, and matchup as input variables
+        # get the blocks season average
         away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current rebound average and winning percentage
+        # iterate over the team stats, find their current block average and winning percentage
         current_block_average = 0
-        current_winning_pct = 0
+        current_winning_percentage = 0
 
         for team_stats_index, team_stats_row in away_team_stats.iterrows():
             year = away_team_stats.at[team_stats_index, "YEAR"]
@@ -903,7 +901,7 @@ def predict_team_blocks():
                 current_winning_percentage = away_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
-        # found the turnover average and winning percentage
+        # found the block average and winning percentage
         # encode the matchup using the global labelEncoder
         global labelEncoder
         le = labelEncoder
@@ -920,18 +918,17 @@ def predict_team_blocks():
         # store this prediction in the dictionary that will be returned
         predictions[away_team_abbreviation] = away_team_prediction[0]
 
-        # now that we have the away team prediction, we can predict the assists for the home team
+        # now that we have the away team prediction, we can predict the blocks for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
-        # home_rebound_model = create_rebound_model(home_team_abbreviation, home_matchup)
         home_block_model = create_blocks_model(home_team_abbreviation)
 
         # now make a prediction for the home team
-        # the model requires assist season average, current winning percentage, and matchup as input variables
-        # get the assist season average
+        # the model requires block season average, current winning percentage, and matchup as input variables
+        # get the block season average
         home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
 
-        # iterate over the team stats, find their current assist average and winning percentage
+        # iterate over the team stats, find their current block average and winning percentage
         current_block_average = 0
         current_winning_percentage = 0
         for team_stats_index, team_stats_row in home_team_stats.iterrows():
@@ -942,7 +939,7 @@ def predict_team_blocks():
                 current_winning_percentage = home_team_stats.at[team_stats_index, "WIN_PCT"]
                 break
 
-        # found the rebound average and winning percentage, need to encode the matchup
+        # found the block average and winning percentage, need to encode the matchup
         # use the global label encoder
 
         le = labelEncoder
@@ -977,7 +974,7 @@ def create_steals_model(team_abbrev):
     stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
     stats_df = load_dataset(stats_filename)
 
-    # num assists and win% are in the stats file, so we need to add that to the log dataframe
+    # num steals and win% are in the stats file, so we need to add that to the log dataframe
     log_df["STL_SZN_AVG"] = 0
     log_df["WIN_PCT"] = 0.0
 
@@ -1025,7 +1022,7 @@ def create_steals_model(team_abbrev):
         for stats_index, stats_row in stats_df.iterrows():
             year = stats_df.at[stats_index, "YEAR"]
             if year == season:
-                # get the turnovers and win % from this year
+                # get the steals and win % from this year
                 stl_per_game = stats_df.at[stats_index, "STL"]
                 win_pct = stats_df.at[stats_index, "WIN_PCT"]
 
