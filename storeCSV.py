@@ -27,7 +27,16 @@ def storePlayerStats():
                     player_name = filename.split('/')[-1]
                     player_name = player_name[:-10]
                     player_name = player_name[13:]
-                    #print(player_name)
+                    # print("player name is {}".format(player_name))
+
+                    tokens = player_name.split("_")
+                    f_name = tokens[0]
+                    l_name = ""
+                    if len(tokens) > 1:
+                        l_name = tokens[1]
+                        playerObj["l_name"] = l_name
+
+                    playerObj["f_name"] = f_name
                     playerObj["playerName"] = player_name
                     playerObj["seasons"] = []
                 i = 3
