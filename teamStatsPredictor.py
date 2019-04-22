@@ -1450,6 +1450,11 @@ def predict():
     for team in steals:
         teamObj[team]["steals"] = str(steals[team])
 
+    # add the fouls predictions
+    fouls = predict_team_fouls()
+    for team in fouls:
+        teamObj[team]["fouls"] = str(fouls[team])
+
     return teamObj
 
 if __name__ == "__main__":
