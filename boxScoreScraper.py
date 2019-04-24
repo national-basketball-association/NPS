@@ -47,6 +47,8 @@ teamToIndex = {
     'WAS': 29,
 }
 
+filepath = sys.argv[1]+'/' if len(sys.argv) == 2 else ''
+
 # loads box scores for a team into data frame
 def getTeamBoxScoreForYear(teamName, season):
     teamNameId = getTeamIdFromName(teamName)
@@ -90,7 +92,7 @@ def getTeamBoxScoresBetweenYears(teamName, start_year, end_year):
     frame = frame.sort_values("GAME_DATE")
 
 
-    filename = 'datasets/{}_{}_to_{}.csv'.format(teamName, start_year, end_year)
+    filename = '{}datasets/{}_{}_to_{}.csv'.format(filepath, teamName, start_year, end_year)
     # print(filename)
     frame.to_csv(filename, index=None, header=True)
 
@@ -180,7 +182,7 @@ def writeRegularSeasonStatsToCsv(player_name, regular_season_stats):
     player_name.replace(" ", "_")
 
     # format the filename
-    filename = 'datasets/player_stats/{}_Reg_Season_Stats.csv'.format(player_name)
+    filename = '{}datasets/player_stats/{}_Reg_Season_Stats.csv'.format(filepath,  player_name)
     # print(filename)
     regular_season_stats.to_csv(filename, index=None, header=True)
 
@@ -252,7 +254,7 @@ def scrapePlayerStats():
 
         current_player_stats = playercareerstats.PlayerCareerStats(curr_id).get_data_frames()[0]
         print(current_player_stats)
-        filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_full_name)
+        filename = '{}datasets/player_stats/{}_Stats.csv'.format(filepath, formatted_full_name)
 
         current_player_stats.to_csv(filename, index=None, header=True)
         print("Wrote to {}".format(filename))
@@ -273,7 +275,7 @@ def scrapeTodaysPlayerStats(player_ids):
         formatted_name = player_name.replace(" ", "_")
         current_player_stats = playercareerstats.PlayerCareerStats(player_id).get_data_frames()[0]
         print(current_player_stats)
-        filename = 'datasets/player_stats/{}_Stats.csv'.format(formatted_name)
+        filename = '{}datasets/player_stats/{}_Stats.csv'.format(filepath, formatted_name)
 
         current_player_stats.to_csv(filename, index=None, header=True)
         print("Wrote to {}".format(filename))
@@ -291,7 +293,7 @@ def scrapeTeamRosters():
         time.sleep(5)
         current_team_roster = commonteamroster.CommonTeamRoster(team_id=team_id).get_data_frames()[0]
         print(current_team_roster)
-        filename = 'datasets/rosters/{}_Roster.csv'.format(team_abbrev)
+        filename = '{}datasets/rosters/{}_Roster.csv'.format(filepath, team_abbrev)
         current_team_roster.to_csv(filename, index=None, header=True)
         print("finished {}'s roster".format(team_abbrev))
 
@@ -313,7 +315,7 @@ def scrapeTeamStats():
                                                                      season_type_all_star="Regular Season",
                                                                      team_id=team_id).get_data_frames()[0]
 
-        filename = 'datasets/team_stats/{}_Stats_By_Year.csv'.format(team_abbrev)
+        filename = '{}datasets/team_stats/{}_Stats_By_Year.csv'.format(filepath, team_abbrev)
 
         recent_team_stats = current_team_stats.tail(5) # get the 5 most recent years of stats
 
@@ -327,12 +329,12 @@ def scrape():
     pandas.set_option('display.max_columns', None)
 
     scrapeTeamStats()
-    # getAllTeamBoxScoresBetweenYears(2015, 2018)
-    # scrapePlayerStats()
-    # scrapeTeamRosters()
+    getAllTeamBoxScoresBetweenYears(2015, 2018)
+    scrapePlayerStats()
+    scrapeTeamRosters()
 
-    # todays_players = getTodaysPlayers()
-    # scrapeTodaysPlayerStats(todays_players)
+    todays_players = getTodaysPlayers()
+    scrapeTodaysPlayerStats(todays_players)
 
 if __name__ == "__main__":
     scrape()

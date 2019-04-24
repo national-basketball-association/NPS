@@ -25,6 +25,8 @@ from pprint import PrettyPrinter
 
 verbose = False
 
+filepath = sys.argv[1] + '/' if len(sys.argv) == 2 else ''
+
 def load_dataset(filename):
     """
     Given a filename pointing to a CSV file that contains game logs for a
@@ -290,7 +292,7 @@ def get_team_record(team_abbrev):
     :param team_abbrev:
     :return:
     """
-    filename = "datasets/team_stats/" + team_abbrev + "_Stats_By_Year.csv"
+    filename = filepath + "datasets/team_stats/" + team_abbrev + "_Stats_By_Year.csv"
 
     # print(filename)
 
@@ -404,7 +406,7 @@ def predict_todays_games():
         matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
 
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename) # load a dataframe for the teams data
 
         # create a model for the current team

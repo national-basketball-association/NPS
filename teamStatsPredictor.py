@@ -25,6 +25,8 @@ import pprint
 verbose = False
 labelEncoder = None
 
+filepath = sys.argv[1] + '/' if len(sys.argv) == 2 else ''
+
 def load_dataset(filename):
     """
     Given a filename pointing to a CSV file that contains game logs for a
@@ -45,11 +47,11 @@ def create_assists_model(team_abbrev):
     """
 
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
 
@@ -190,7 +192,7 @@ def predictTeamAssists():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_assists_model = create_assists_model(away_team_abbreviation)
@@ -203,7 +205,7 @@ def predictTeamAssists():
         # first make a prediction for the away team
         # the model requires assist season average, current winning percentage, and matchup as input variables
         # get the assist season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current assist average and winning percentage
         current_assist_average = 0
@@ -244,7 +246,7 @@ def predictTeamAssists():
         # now make a prediction for the home team
         # the model requires assist season average, current winning percentage, and matchup as input variables
         # get the assist season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current assist average and winning percentage
         current_assist_average = 0
@@ -289,11 +291,11 @@ def create_turnovers_model(team_abbrev, matchup):
     :return: a model that predicts the number of turnovers a team will have in their upcoming matchup
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # num turnovers and win% are in the stats file, so we need to add that to the log dataframe
@@ -426,7 +428,7 @@ def predictTeamTurnovers():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_turnovers_model = create_turnovers_model(away_team_abbreviation, away_matchup)
@@ -436,7 +438,7 @@ def predictTeamTurnovers():
         # first make a prediction for the away team
         # the model requires turnovers season average, current winning percentage, and matchup as input variables
         # get the turnovers season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current turnover average and winning percentage
         current_turnover_average = 0
@@ -476,7 +478,7 @@ def predictTeamTurnovers():
         # now make a prediction for the home team
         # the model requires turnovers season average, current winning percentage, and matchup as input variables
         # get the turnovers season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current turnovers average and winning percentage
         current_turnover_average = 0
@@ -519,11 +521,11 @@ def create_rebound_model(team_abbrev, matchup):
     :return: a model that predicts the number of rebounds a team will have in their upcoming matchup
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # num rebound and win% are in the stats file, so we need to add that to the log dataframe
@@ -652,7 +654,7 @@ def predictTeamRebounds():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_rebounds_model = create_rebound_model(away_team_abbreviation, away_matchup)
@@ -662,7 +664,7 @@ def predictTeamRebounds():
         # first make a prediction for the away team
         # the model requires rebounds season average, current winning percentage, and matchup as input variables
         # get the rebounds season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current rebound average and winning percentage
         current_rebound_average = 0
@@ -701,7 +703,7 @@ def predictTeamRebounds():
         # now make a prediction for the home team
         # the model requires rebound season average, current winning percentage, and matchup as input variables
         # get the rebound season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current rebound average and winning percentage
         current_rebound_average = 0
@@ -745,11 +747,11 @@ def create_blocks_model(team_abbrev):
     :return: a DecisionTreeClassifier that can be used to predict blocks for the given team in their matchup
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # num blocks and win% are in the stats file, so we need to add that to the log dataframe
@@ -877,7 +879,7 @@ def predict_team_blocks():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_blocks_model = create_blocks_model(away_team_abbreviation)
@@ -887,7 +889,7 @@ def predict_team_blocks():
         # first make a prediction for the away team
         # the model requires blocks season average, current winning percentage, and matchup as input variables
         # get the blocks season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current block average and winning percentage
         current_block_average = 0
@@ -926,7 +928,7 @@ def predict_team_blocks():
         # now make a prediction for the home team
         # the model requires block season average, current winning percentage, and matchup as input variables
         # get the block season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current block average and winning percentage
         current_block_average = 0
@@ -967,11 +969,11 @@ def create_steals_model(team_abbrev):
     :return: type <DecisionTreeClassifier> that can be used to predict steal outcomes for a single game
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # num steals and win% are in the stats file, so we need to add that to the log dataframe
@@ -1100,7 +1102,7 @@ def predict_team_steals():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_steals_model = create_steals_model(away_team_abbreviation)
@@ -1110,7 +1112,7 @@ def predict_team_steals():
         # first make a prediction for the away team
         # the model requires steals season average, current winning percentage, and matchup as input variables
         # get the steals season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current steal average and winning percentage
         current_steal_average = 0
@@ -1150,7 +1152,7 @@ def predict_team_steals():
         # now make a prediction for the home team
         # the model requires steal season average, current winning percentage, and matchup as input variables
         # get the steal season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current steal average and winning percentage
         current_steal_average = 0
@@ -1193,11 +1195,11 @@ def create_fouls_model(team_abbrev):
     :return: <DecisionTreeClassifier> model that can be used to predict fouls for the given team
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # average fouls and win% are in the stats file, so we need to add that to the log dataframe
@@ -1326,7 +1328,7 @@ def predict_team_fouls():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_fouls_model = create_fouls_model(away_team_abbreviation)
@@ -1336,7 +1338,7 @@ def predict_team_fouls():
         # first make a prediction for the away team
         # the model requires fouls season average, current winning percentage, and matchup as input variables
         # get the fouls season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current fouls average and winning percentage
         current_fouls_average = 0
@@ -1376,7 +1378,7 @@ def predict_team_fouls():
         # now make a prediction for the home team
         # the model requires pf season average, current winning percentage, and matchup as input variables
         # get the pf season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current foul average and winning percentage
         current_fouls_average = 0
@@ -1420,11 +1422,11 @@ def create_three_point_model(team_abbrev):
     :return:
     """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # average 3pt% and win% are in the stats file, so we need to add that to the log dataframe
@@ -1553,7 +1555,7 @@ def predict_team_three_pt_percentage():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_three_pt_model = create_three_point_model(away_team_abbreviation)
@@ -1563,7 +1565,7 @@ def predict_team_three_pt_percentage():
         # first make a prediction for the away team
         # the model requires 3pt% season average, current winning percentage, and matchup as input variables
         # get the 3pt season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current fouls average and winning percentage
         current_three_pt_average = 0
@@ -1603,7 +1605,7 @@ def predict_team_three_pt_percentage():
         # now make a prediction for the home team
         # the model requires 3pt season average, current winning percentage, and matchup as input variables
         # get the 3pt season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current foul average and winning percentage
         current_three_pt_average = 0
@@ -1646,11 +1648,11 @@ def create_free_throw_model(team_abbrev):
         :return: <LinearRegression> model that can predict their free throw percentage against a team
         """
     # first need to load the game logs
-    log_filename = "datasets/{}_2015_to_2018.csv".format(team_abbrev)
+    log_filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, team_abbrev)
     log_df = load_dataset(log_filename)
 
     # now load the team stats
-    stats_filename = "datasets/team_stats/{}_Stats_By_Year.csv".format(team_abbrev)
+    stats_filename = "{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, team_abbrev)
     stats_df = load_dataset(stats_filename)
 
     # average ft% and win% are in the stats file, so we need to add that to the log dataframe
@@ -1781,7 +1783,7 @@ def predict_team_free_throw_pct():
         # format a matchup string using the abbreviations
         away_matchup = "{} @ {}".format(away_team_abbreviation, home_team_abbreviation)
         # get the dataframe for the away team
-        filename = "datasets/{}_2015_to_2018.csv".format(away_team_abbreviation)
+        filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
         away_ft_model = create_free_throw_model(away_team_abbreviation)
@@ -1791,7 +1793,7 @@ def predict_team_free_throw_pct():
         # first make a prediction for the away team
         # the model requires ft% season average, current winning percentage, and matchup as input variables
         # get the ft season average
-        away_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        away_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current fouls average and winning percentage
         current_ft_average = 0
@@ -1831,7 +1833,7 @@ def predict_team_free_throw_pct():
         # now make a prediction for the home team
         # the model requires ft season average, current winning percentage, and matchup as input variables
         # get the ft season average
-        home_team_stats = load_dataset("datasets/team_stats/{}_Stats_By_Year.csv".format(away_team_abbreviation))
+        home_team_stats = load_dataset("{}datasets/team_stats/{}_Stats_By_Year.csv".format(filepath, away_team_abbreviation))
 
         # iterate over the team stats, find their current foul average and winning percentage
         # current_three_pt_average = 0

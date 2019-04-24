@@ -5,12 +5,14 @@ import numpy as np
 import sys
 
 
+filepath = sys.argv[1] + '/' if len(sys.argv) == 2 else ''
+
 # need to iterate over all the box score files
 def clean():
-    for filename in os.listdir("datasets/"):
+    for filename in os.listdir(filepath + "datasets/"):
         if ".csv" in filename:
             # found a csv file to clean
-            full_filename = "datasets/" + filename
+            full_filename = filepath + "datasets/" + filename
 
             df = pandas.read_csv(full_filename)
 
