@@ -8,10 +8,10 @@ from pprint import PrettyPrinter
 client = MongoClient("mongodb+srv://rmohamme:green12@cluster0-8eolw.mongodb.net/test?retryWrites=true")
 db = client["NPS"]
 
-
+filepath = sys.argv[1] + '/' if len(sys.argv) == 2 else ''
 def storePlayerStats():
     col = db["PLAYER_STATS"]
-    for filename in glob.glob('./datasets/player_stats/*.csv'):
+    for filename in glob.glob(filepath + 'datasets/player_stats/*.csv'):
         with open(filename) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', strict=True)
             line_count = 0
@@ -92,7 +92,7 @@ def storePlayerStats():
 
 def storeTeamStats():
     col = db["TEAM_STATS"]
-    for filename in glob.glob('./datasets/team_stats/*.csv'):
+    for filename in glob.glob(filepath + 'datasets/team_stats/*.csv'):
         with open(filename) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', strict=True)
             teamObj = {}
@@ -153,7 +153,7 @@ def storeTeamStats():
 def storeBoxScores():
     col = db["BOX_SCORES"]
     col2 = db["TEAM_ROSTERS"]
-    for filename in glob.glob('./datasets/*.csv'):
+    for filename in glob.glob(filepath + 'datasets/*.csv'):
         with open(filename) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',', strict=True)
             teamObj = {}
