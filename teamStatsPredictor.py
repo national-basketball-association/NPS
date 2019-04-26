@@ -4,6 +4,8 @@ from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error
+# from sklearn.model_selection.cros
 from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -155,11 +157,20 @@ def create_assists_model(team_abbrev):
 
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
+    global verbose
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for assists:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
 
 
@@ -283,7 +294,7 @@ def predictTeamAssists():
 
 
 
-def create_turnovers_model(team_abbrev, matchup):
+def create_turnovers_model(team_abbrev):
     """
     Given a specific team and their matchup, predicts the number of turnovers they will have in that game
     :param team_abbrev: a string referring to the team the model is being trained for
@@ -393,11 +404,20 @@ def create_turnovers_model(team_abbrev, matchup):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for turnovers:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return dtc
 
@@ -431,7 +451,7 @@ def predictTeamTurnovers():
         filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        away_turnovers_model = create_turnovers_model(away_team_abbreviation, away_matchup)
+        away_turnovers_model = create_turnovers_model(away_team_abbreviation)
 
         # we now have a model for both the home and away team in the current matchup
         # use the model to make a prediction
@@ -473,7 +493,7 @@ def predictTeamTurnovers():
         # now that we have the away team prediction, we can predict the turnovers for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
-        home_turnovers_model = create_turnovers_model(home_team_abbreviation, home_matchup)
+        home_turnovers_model = create_turnovers_model(home_team_abbreviation)
 
         # now make a prediction for the home team
         # the model requires turnovers season average, current winning percentage, and matchup as input variables
@@ -513,7 +533,7 @@ def predictTeamTurnovers():
     return predictions
 
 
-def create_rebound_model(team_abbrev, matchup):
+def create_rebound_model(team_abbrev):
     """
     Given a specific NBA team and their matchup in a game, creates a model
     :param team_abbrev: a string referring to the team the model is being trained for
@@ -620,11 +640,20 @@ def create_rebound_model(team_abbrev, matchup):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for rebounds:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return dtc
 
@@ -657,7 +686,7 @@ def predictTeamRebounds():
         filename = "{}datasets/{}_2015_to_2018.csv".format(filepath, away_team_abbreviation)
         df = load_dataset(filename)  # load a dataframe for the teams data
 
-        away_rebounds_model = create_rebound_model(away_team_abbreviation, away_matchup)
+        away_rebounds_model = create_rebound_model(away_team_abbreviation)
 
         # we now have a model for both the home and away team in the current matchup
         # use the model to make a prediction
@@ -698,7 +727,7 @@ def predictTeamRebounds():
         # now that we have the away team prediction, we can predict the rebounds for the home team
         home_matchup = "{} vs. {}".format(home_team_abbreviation, away_team_abbreviation)
 
-        home_rebound_model = create_rebound_model(home_team_abbreviation, home_matchup)
+        home_rebound_model = create_rebound_model(home_team_abbreviation)
 
         # now make a prediction for the home team
         # the model requires rebound season average, current winning percentage, and matchup as input variables
@@ -845,11 +874,20 @@ def create_blocks_model(team_abbrev):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for blocks:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return dtc
 
@@ -1066,11 +1104,20 @@ def create_steals_model(team_abbrev):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for steals:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return dtc
 
@@ -1293,11 +1340,20 @@ def create_fouls_model(team_abbrev):
     dtc = DecisionTreeClassifier()
     dtc.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = dtc.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = dtc.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for fouls:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return dtc
 
@@ -1521,11 +1577,20 @@ def create_three_point_model(team_abbrev):
     clf = LinearRegression() # have to use a linear regression algorithm in order to predict floats
     clf.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = clf.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = clf.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for three point model:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return clf
 
@@ -1749,11 +1814,20 @@ def create_free_throw_model(team_abbrev):
     clf = LinearRegression()  # have to use a linear regression algorithm in order to predict floats
     clf.fit(X_train, Y_train)
     if verbose:
+
+
         predictions = clf.predict(X_validation)
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
+        testing_predictions = clf.predict(X_train)
+
+        # print(accuracy_score(Y_validation, predictions))
+        # print(confusion_matrix(Y_validation, predictions))
+        # print(classification_report(Y_validation, predictions))
+        print("Mean squared error for free throw average:")
+        print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
+        print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
+
         print()
+
 
     return clf
 
@@ -1923,5 +1997,3 @@ def predict():
 
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
-
-    # predictions = predict()
