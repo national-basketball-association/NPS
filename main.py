@@ -11,8 +11,8 @@ from pprint import PrettyPrinter
 
 if __name__ == "__main__":
     pp = PrettyPrinter(indent=4)
-    boxScoreScraper.scrape() # gets the players playing today
-    csv_cleaner.clean()
+    # boxScoreScraper.scrape() # gets the players playing today
+    # csv_cleaner.clean()
     teamInfo = gameOutcomePredictor.predict_todays_games() #An array of predicted winners
     teamObj = teamStatsPredictor.predict() #An object of predicted statistics per teams
 
