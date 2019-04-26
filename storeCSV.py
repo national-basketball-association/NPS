@@ -48,7 +48,7 @@ def storePlayerStats():
                     "PLAYER_AGE": row[5],
                     "GP": row[6],
                     "GS": row[7],
-                    "MIN": row[8],
+                    "MIN": row[8] / row[6],
                     "FGM": row[9],
                     "FGA": row[10],
                     "FG_PCT": row[11],
