@@ -171,6 +171,8 @@ def create_assists_model(team_abbrev):
         print("For training set: {}".format(mean_squared_error(Y_train, testing_predictions)))
         print("For testing set: {}".format(mean_squared_error(Y_validation, predictions)))
 
+
+
         print()
 
 
@@ -1997,3 +1999,6 @@ def predict():
 
 if __name__ == "__main__":
     pandas.set_option('display.max_columns', None)
+
+    verbose = True
+    create_assists_model("ATL")

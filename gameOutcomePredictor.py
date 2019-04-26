@@ -180,13 +180,22 @@ def create_model(dataset):
 
 
     # this is some stuff for displaying statistics for the model
+    # if verbose:
+    #     # print(accuracy_score(Y_validation, predictions))
+    #     # print(confusion_matrix(Y_validation, predictions))
+    #     # print(classification_report(Y_validation, predictions))
+    #     # print()
+    #
+    #
+    verbose = True
     if verbose:
-        print(accuracy_score(Y_validation, predictions))
-        print(confusion_matrix(Y_validation, predictions))
-        print(classification_report(Y_validation, predictions))
-        print()
-
-
+        print("Cross val score for training set: ")
+        kfold = model_selection.KFold(n_splits=5, random_state=seed)
+        training_scores = model_selection.cross_val_score(dtc, X_train, Y_train, cv=kfold, scoring=scoring)
+        print("Accuracy: %0.2f (+/- %0.2f)" % (training_scores.mean(), training_scores.std() * 2))
+        print("Cross val score for testing set: ")
+        testing_scores = model_selection.cross_val_score(dtc, X_validation, Y_validation, cv=kfold, scoring=scoring)
+        print("Accuracy: %0.2f (+/- %0.2f)" % (testing_scores.mean(), testing_scores.std() * 2))
 
     return dtc
 
@@ -415,6 +424,9 @@ def predict_todays_games():
         prediction = make_prediction(model, matchup, df)
 
 
+
+
+
         if 1 in prediction:
             # this means that the away team won the game
             winners.append(away_team_abbreviation)
@@ -508,10 +520,13 @@ def predict_todays_games():
 
 
 
+
+
     return team_info
 
 
 if __name__ == "__main__":
     predictions = predict_todays_games()
+    verbose = True
     pp = PrettyPrinter(indent=4)
     pp.pprint(predictions)
