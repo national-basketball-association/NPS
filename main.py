@@ -3,6 +3,7 @@ import csv_cleaner
 import gameOutcomePredictor
 import teamStatsPredictor
 import storeCSV
+import bettingOdds
 import sys
 from pprint import PrettyPrinter
 
@@ -30,3 +31,4 @@ if __name__ == "__main__":
 
 
     storeCSV.store(teamInfo) # store results into a database
+    bettingOdds.getOdds() # gets betting odds and stores them in db
