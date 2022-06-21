@@ -6,7 +6,7 @@ idna==2.8
 kiwisolver==1.0.1
 matplotlib==3.0.3
 nba-api==1.0.7
-numpy==1.16.1
+numpy==1.22.0
 pandas==0.24.1
 pymongo==3.7.2
 pyparsing==2.3.1
